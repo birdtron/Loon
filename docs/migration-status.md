@@ -13,9 +13,15 @@ Migration prepared on October 19, 2026 from main commit `4e21810c0b377fd2ee9b305
 - Netlify project created in Bird & Co: `loon-production-workspace`, ID `2fbb500e-c396-42b0-8f01-5cbb3551c5d8`.
 - `.netlify/` is ignored so machine-specific linking state is not committed.
 
-## Still to verify
+## Deployment verification
 
-- Deploy source through Netlify and confirm the public login page at https://loon-production-workspace.netlify.app.
+- Published at https://loon-production-workspace.netlify.app on October 19, 2026. Successful deploy: `6ad654562286832410d5c7f2`; application source commit: `8522cf96a0084b08d138625a488056271af3456f`.
+- The initial source upload omitted the Next.js adapter and served 404. Explicitly adding the unversioned `@netlify/plugin-nextjs` fixed it; the follow-up deploy includes the Next.js function and routing rules.
+- HTTPS homepage returned 200 with the Loon title and application shell, and all seven referenced JavaScript bundles returned 200. No ChatGPT login redirect remains.
+- Anonymous HTTPS requests using the publishable key returned 401 for all six business tables.
+- These are build, database and HTTP checks, not a completed browser/login test.
+
+## Remaining account actions
 - Connect the existing Netlify project to GitHub `birdtron/Loon`, production branch `main`, for automatic builds. The connector's source-upload deployment does not itself establish Git continuous deployment.
 - In Supabase Authentication > URL Configuration, set Site URL to https://loon-production-workspace.netlify.app and allow https://loon-production-workspace.netlify.app/ as a redirect. Preserve the old Sites redirect while it is a fallback.
 - Owner creates their own password, confirms their reserved email, then signs in. Verify Thanos, production loading, logout, performance edits, AEA tier saves and persistence in a real browser.
