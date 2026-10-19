@@ -4,3 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Source-upload deploys need an explicit adapter; Git builds also use this.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
