@@ -35,3 +35,5 @@ Personnel: 56 fictional demo profiles, 63 production credits, 47 attributed port
 Design changes must follow [DESIGN.md](DESIGN.md), the researched Loon design standard and release checklist.
 
 Cast Scheduling: open a production → Stage Management → Cast Scheduling. Set the date/time, act/scene and work, location, and called cast; Submit to callboard publishes the rehearsal to that date and the master calendar. Edit or cancel calls from the production's Callboard or Scheduled calls. The main Callboard supports date and show filters.
+
+Settings are available from the gear beside the lower-left profile icon. Includes personal preferences, theater identity/current season/timezone, email access reservations and role/delegation controls, rehearsal defaults, and reusable calendar templates. Reservations send no emails. Calendar templates preview dates and create draft activities without changing existing schedules. See `docs/architecture.md` and the rollback-only `docs/settings-security-checks.sql`.

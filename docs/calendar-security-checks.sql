@@ -29,9 +29,9 @@ begin
   update public.calendar_events set event_details='stale' where id=e.id and updated_at=e.updated_at;
   assert not found, 'Stale update must affect no rows';
   insert into public.calendar_events(theater_id,production_id,title,category,start,"end")
-    select theater_id,production_id,title,category,start,"end" from public.calendar_events where id=activity_id
-    on conflict(theater_id,production_id,category,start) where category<>'Rehearsal' do nothing;
-  assert not found, 'Duplicate category/start should be ignored by seed upsert';
+    select theater_id,production_id,title,category,start,"end" from public.calendar_events where id=e.id
+    on conflict(theater_id,production_id,category,start) where category='Performance' do nothing;
+  assert not found, 'Duplicate performance/start should be ignored by seed upsert';
   insert into public.calendar_events(theater_id,production_id,title,category,start,"end",is_demo)
     values(p.theater_id,p.id,'ROLLBACK ONLY meeting','Meeting',p.closing_date+interval '1 day 09 hours',p.closing_date+interval '1 day 10 hours',true);
   rejected:=false;

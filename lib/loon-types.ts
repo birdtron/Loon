@@ -1,5 +1,5 @@
 export type Production = {
-  id: string; theater_id: string; venue_id: string | null; title: string;
+  id: string; theater_id: string; season_id: string; venue_id: string | null; title: string;
   full_description: string; opening_date: string; closing_date: string;
   runtime: string; runtime_minutes: number; rating: string;
   content_warnings: string[]; series: string | null; is_aea: boolean | null;

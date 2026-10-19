@@ -2,7 +2,7 @@
 import {useState} from 'react';
 import {Check, X} from 'lucide-react';
 import {activityCategories, type ActivityCategory, type ActivityDraft, type CalendarEvent, type Production, type Venue} from '../lib/loon-types';
-import {toUTC, wallTime} from '../lib/calendar';
+import {zoneLabel,toUTC, wallTime} from '../lib/calendar';
 type Props = {event?: CalendarEvent; day: string; productionId: string; productions: Production[]; venues: Venue[]; onSave: (draft: ActivityDraft) => Promise<void>; onClose: () => void};
 export default function CalendarActivityDialog({event, day, productionId, productions, venues, onSave, onClose}: Props) {
   const [form, setForm] = useState({production_id: event?.production_id || productionId || productions[0]?.id || '', title: event?.title || '', category: (event?.category || 'Strike') as ActivityCategory, start: event ? wallTime(event.start) : `${day}T09:00`, end: event ? wallTime(event.end) : `${day}T17:00`, venue_id: event?.venue_id || '', event_details: event?.event_details || '', call_status: event?.call_status || 'Draft'});
@@ -22,8 +22,8 @@ export default function CalendarActivityDialog({event, day, productionId, produc
     <label>Production<select required value={form.production_id} onChange={e => setForm({...form, production_id: e.target.value})}>{productions.map(p => <option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
     <label>Activity type<select value={form.category} onChange={e => setForm({...form, category: e.target.value as ActivityCategory})}>{activityCategories.map(category => <option key={category}>{category}</option>)}</select></label>
     <label>Title<input required maxLength={200} placeholder="e.g. Titus scenic strike" value={form.title} onChange={e => setForm({...form, title: e.target.value})}/></label>
-    <label>Start <small>Eastern time</small><input type="datetime-local" required value={form.start} onInput={e => setForm({...form, start: e.currentTarget.value})} onChange={e => setForm({...form, start: e.target.value})}/></label>
-    <label>End <small>Eastern time</small><input type="datetime-local" required value={form.end} onInput={e => setForm({...form, end: e.currentTarget.value})} onChange={e => setForm({...form, end: e.target.value})}/></label>
+    <label>Start <small>{zoneLabel()} time</small><input type="datetime-local" required value={form.start} onInput={e => setForm({...form, start: e.currentTarget.value})} onChange={e => setForm({...form, start: e.target.value})}/></label>
+    <label>End <small>{zoneLabel()} time</small><input type="datetime-local" required value={form.end} onInput={e => setForm({...form, end: e.currentTarget.value})} onChange={e => setForm({...form, end: e.target.value})}/></label>
     <p className="form-help">An activity can span multiple days. An end at midnight does not include the following day.</p>
     <label>Book a venue<select value={form.venue_id} onChange={e => setForm({...form, venue_id: e.target.value})}><option value="">No venue booking</option>{venues.map(venue => <option value={venue.id} key={venue.id}>{venue.name}</option>)}</select></label>
     <p className="form-help">Choosing a venue reserves it for the entire activity. Overlapping bookings are rejected.</p>

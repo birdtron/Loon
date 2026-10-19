@@ -1,5 +1,8 @@
 import type {CalendarEvent, Production} from './loon-types';
-export const calendarZone = 'America/New_York';
+export let calendarZone = 'America/New_York';
+export let timeFormat='12';
+export function configureCalendar(zone:string,format='12'){new Intl.DateTimeFormat('en-US',{timeZone:zone});calendarZone=zone;timeFormat=format;}
+export function zoneLabel(){return calendarZone.replaceAll('_',' ');}
 export function localDay(value: string | Date) {
   const parts = new Intl.DateTimeFormat('en-CA', {timeZone: calendarZone, year: 'numeric', month: '2-digit', day: '2-digit'}).formatToParts(new Date(value));
   const part = (type: string) => parts.find(p => p.type === type)!.value;
@@ -17,7 +20,7 @@ export function displayDay(day: string, options: Intl.DateTimeFormatOptions = {m
   return new Intl.DateTimeFormat('en-US', {timeZone: 'UTC', ...options}).format(new Date(`${day}T12:00:00Z`));
 }
 export function displayTime(value: string) {
-  return new Intl.DateTimeFormat('en-US', {timeZone: calendarZone, hour: 'numeric', minute: '2-digit'}).format(new Date(value));
+  return new Intl.DateTimeFormat('en-US', {timeZone: calendarZone, hour: 'numeric', minute: '2-digit',hour12:timeFormat==='12'}).format(new Date(value));
 }
 export type CalendarItem = {id: string; productionId: string; label: string; category: string; startDay: string; endDay: string; event?: CalendarEvent};
 export function calendarItems(productions: Production[], events: CalendarEvent[]): CalendarItem[] {
