@@ -1,6 +1,6 @@
 # Loon: first working slice
 
-Loon uses React and Next.js conventions, built with Vinext for Cloudflare Workers hosting. Supabase provides PostgreSQL, Auth, and row-level security. The private hosting boundary uses ChatGPT sign-in; database operations additionally require the owner's verified Supabase login. These are separate identities, and the browser never receives a service-role key.
+Loon uses React and standard Next.js App Router, prepared for Netlify's automatic Next.js runtime. Supabase provides PostgreSQL, Auth, and row-level security. The login page is public; database operations require the owner's verified Supabase login. The browser receives only a publishable key, never a service-role key. The earlier ChatGPT Sites deployment remains a separate fallback until the replacement is verified.
 
 ## Data relationships
 
