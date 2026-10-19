@@ -39,3 +39,6 @@ next-env.d.ts
 
 .netlify/
 *.tsbuildinfo
+
+# Supabase CLI local cache
+/supabase/.temp/

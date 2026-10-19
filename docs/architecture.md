@@ -4,7 +4,7 @@ Loon uses React and standard Next.js App Router, prepared for Netlify's automati
 
 ## Data relationships
 
-Theaters own seasons, scripts, venues, productions and calendar events. Productions reference their season, script and venue. Each performance is a calendar event with category Performance. Compound foreign keys reject cross-theater links. Timestamps are stored as timestamptz and shown in America/New_York; production opening and closing values are calendar dates.
+Theaters own seasons, scripts, venues, productions and calendar events. Productions reference their season, script and venue. Performances and production activities are calendar events. Categories are Performance, Rehearsal, Tech, Load-in, Strike, Meeting, and Other. Compound foreign keys reject cross-theater links. Timestamps are stored as timestamptz and shown in America/New_York; production opening and closing values are calendar dates.
 
 ## Owner access
 
@@ -21,3 +21,14 @@ The initial import resolves sheet names to generated UUIDs. Demo seed statements
 No casting, reports, notifications, ticketing, payroll calculations or file uploads are implemented. AEA flag and tier can be saved, but applicable agreement-year rules are not active. Incomplete draft productions may leave is_aea unknown until the owner selects it. Production status is derived from dates at display time; the old imported In Rehearsal values are historical metadata. Import review state Draft does not grant access or publish a website.
 
 The Supabase sign-up confirmation template and redirect settings must be verified against the final hosted origin. The interface supports returning to sign in after confirming an email even if the configured confirmation redirect points elsewhere. Auth email deliverability and real owner sign-in require the owner to complete the flow; they cannot be proven by a build.
+
+
+## Master Calendar
+
+The default calendar displays 30 consecutive Eastern calendar dates. Production opening and closing dates generate read-only performance-run bars, inclusive of both dates. Actual performances and activities appear as separate timed events. Bars continue across week boundaries, and activities ending exactly at midnight exclude the following day. Date navigation uses calendar arithmetic across daylight saving changes.
+
+The View selector switches between the 30-day calendar and an all-dates list. Production and series filters combine in both views; changing series clears incompatible production selections. Selecting a run opens the production; selecting an event edits that event. Calendar filters and dates remain in place when returning from a production opened from the calendar.
+
+Activities may be scheduled outside production opening/closing dates. Performance validation remains restricted to the production run. Choosing a venue books the entire activity interval, and the existing transaction lock prevents overlapping non-canceled bookings across all categories. Activities without a venue are planning entries, not venue bookings. Activity edits use updated_at optimistic concurrency. Thanos RLS remains required for all reads and writes.
+
+Verification: date/layout unit tests, production build, and local browser checks cover filter combinations, list/calendar switching, creating multi-day activities, invalid end dates, and phone layouts. docs/calendar-security-checks.sql tests owner/nonowner permissions and activity constraints inside a rolled-back transaction. The separate Supabase Auth advisor warning for disabled leaked-password protection is an account setting, not part of this schema change: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.

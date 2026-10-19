@@ -1,6 +1,6 @@
 # Loon — Production Workspace
 
-A private, Supabase-backed theater production workspace. First release: owner sign-in, two production dashboards, a 45-performance schedule, venue directory, performance editing, and per-production AEA tier selection.
+A private, Supabase-backed theater production workspace. First release: owner sign-in, two production dashboards, a 30-day Master Calendar with production/series filters and activity scheduling, a 45-performance demo schedule, venue directory, performance editing, and per-production AEA tier selection.
 
 ## Development
 
@@ -27,3 +27,5 @@ Owner email delivery and the first real login must be completed by the owner. Su
 ## Netlify migration
 
 `netlify.toml` configures `pnpm build` and `.next`. Connect this repository’s `main` branch to Netlify for automatic builds; never upload `.next` as a plain static site. No ChatGPT login is required on this version. Supabase login and database authorization still protect business records. See `docs/migration-status.md` for verified progress and remaining account setup.
+
+Calendar date tests: `node --experimental-strip-types --test tests/calendar.test.mjs`. See `docs/calendar-security-checks.sql` for rollback-only database checks on an installation with a verified owner.
