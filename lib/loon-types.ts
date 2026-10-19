@@ -30,3 +30,8 @@ export type Person = {
 };
 export type ProductionCredit = {id: string; theater_id: string; production_id: string; person_id: string; role: string; credit_type: PersonType; billing_order: number};
 export type PersonDraft = Pick<Person, 'display_name' | 'first_name' | 'last_name' | 'known_as' | 'person_types' | 'job_title' | 'departments' | 'area' | 'hometown' | 'bio' | 'favorite_shakespeare' | 'unions' | 'intern'>;
+
+export type RehearsalCall = {event_id: string; theater_id: string; production_id: string; work: string; act: string; scene: string; location: string};
+export type CallCast = {event_id: string; person_id: string; theater_id: string; production_id: string};
+export type CallDraft = {id: string; production_id: string; expected_updated_at: string | null; start: string; end: string; venue_id: string | null; work: string; act: string; scene: string; location: string; notes: string; person_ids: string[]; call_status: 'Published' | 'Canceled'};
+export type SavedCall = {event: CalendarEvent; call: RehearsalCall; cast: CallCast[]};

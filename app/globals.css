@@ -576,3 +576,61 @@ table { font-variant-numeric: tabular-nums; }
 .calendar-bar { font-size: 11px; }
 .calendar-caption, .calendar-legend { font-size: 12px; }
 input.sr-only:not([type=checkbox]) { width: 1px; height: 1px; padding: 0; margin: -1px; border: 0; }
+
+/* Stage management: dated work and cast selection, with the callboard alongside. */
+.production-sections { display:flex; gap:24px; border-bottom:1px solid var(--line); margin:0 0 28px; }
+.production-sections button { padding:12px 0; font-size:14px; border-bottom:2px solid transparent; }
+.production-sections button[aria-pressed=true] { color:var(--aqua); border-bottom-color:var(--aqua); }
+.stage-heading { display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:10px; }
+.stage-heading h1 { font-size:42px; margin-bottom:15px; }
+.stage-heading > label { width:260px; max-width:100%; font-size:12px; }
+.cast-call-form { max-width:1000px; }
+.call-form-intro p { font-size:14px; }
+.cast-call-form fieldset { padding:8px 0 20px; border:0; border-top:1px solid var(--line); border-radius:0; margin:24px 0; min-width:0; }
+.cast-call-form legend { padding:0 15px 0 0; font-size:16px; color:var(--aqua); }
+.call-field-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.call-field-row.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.call-field-row label { min-width:0; }
+.cast-chips { display:flex; flex-wrap:wrap; gap:10px; }
+.cast-chip { display:flex; align-items:center; gap:9px; border:1px solid var(--line); border-radius:5px; padding:7px 9px; max-width:100%; min-width:0; }
+.cast-chip .person-headshot, .cast-option .person-headshot { width:34px; height:40px; flex-shrink:0; aspect-ratio:auto; border-radius:3px; }
+.cast-chip strong { display:block; font-size:13px; color:var(--aqua); }
+.cast-chip small, .cast-option small { display:block; font-size:12px; color:var(--muted); }
+.cast-chip button { min-width:28px; min-height:28px; margin-left:auto; }
+.cast-chip .headshot-placeholder svg,.cast-chip .headshot-placeholder span,.cast-option .headshot-placeholder svg,.cast-option .headshot-placeholder span { display:none; }
+.cast-chip .headshot-placeholder strong,.cast-option .headshot-placeholder strong { font-size:11px; }
+.selected-cast:empty { display:none; }
+.cast-picker-tools { display:flex; align-items:center; flex-wrap:wrap; gap:16px; margin:20px 0 12px; }
+.cast-picker-tools .search { flex:1; max-width:380px; }
+.cast-picker-tools .search input { width:100%; min-width:0; }
+.cast-picker-tools .text-button { padding:8px 0; }
+.cast-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); max-height:350px; overflow:auto; border-block:1px solid var(--line); }
+form .cast-option { display:flex; gap:10px; align-items:center; padding:12px 8px; margin:0; border-bottom:1px solid var(--line); font-weight:400; cursor:pointer; }
+.cast-option:has(input:checked) { background:#d0f4f40b; }
+.cast-option strong { font-size:14px; color:var(--aqua); }
+.cast-option input { flex-shrink:0; }
+.call-submit { display:flex; align-items:center; gap:24px; justify-content:space-between; }
+.call-submit p { max-width:450px; }
+.call-submit button { flex-shrink:0; }
+.scheduled-calls { margin-top:44px; padding-top:24px; border-top:1px solid var(--line); }
+.scheduled-calls > button { display:grid; grid-template-columns:180px minmax(0,1fr) 90px 40px; gap:16px; width:100%; padding:16px 0; border-bottom:1px solid var(--line); text-align:left; }
+.scheduled-calls button span { font-size:12px; }
+.scheduled-calls button strong { color:var(--aqua); font-weight:500; }
+.callboard-tools { display:flex; align-items:end; flex-wrap:wrap; gap:16px; margin-bottom:16px; }
+.callboard-tools > label { font-size:12px; min-width:150px; }
+.callboard-date { display:flex; align-items:center; gap:12px; margin-right:auto; }
+.callboard-date h2 { font-size:21px; margin:0; }
+.callboard-date button { padding:8px; min-height:36px; }
+.rehearsal-entry { display:grid; grid-template-columns:160px minmax(0,1fr); gap:28px; padding:28px 0; border-top:1px solid var(--line); }
+.rehearsal-time strong { font-size:16px; color:var(--aqua); }
+.rehearsal-time > span { display:block; margin-top:8px; font-size:12px; color:var(--muted); }
+.rehearsal-time .text-button { padding:12px 0; }
+.rehearsal-body h3 { margin-bottom:10px; font-size:24px; }
+.rehearsal-work { margin:0 0 12px; }
+.rehearsal-location { color:var(--yellow); font-size:14px; margin-bottom:14px; }
+.rehearsal-notes { white-space:pre-line; font-size:14px; }
+.rehearsal-body h4 { color:var(--aqua); font-size:14px; font-weight:500; margin-bottom:12px; }
+.rehearsal-body h4 span { color:var(--muted); margin-left:6px; }
+@media(max-width:1100px){.callboard-date{width:100%;}.stage-heading{align-items:start;}.stage-heading h1{font-size:36px;}.scheduled-calls>button{grid-template-columns:140px minmax(0,1fr) 75px;}.scheduled-calls>button span:last-child{display:none;}}
+@media(max-width:760px){.stage-heading{flex-direction:column;gap:6px;}.stage-heading>label{width:100%;margin-bottom:12px;}.call-field-row.three{grid-template-columns:1fr 1fr;}.call-field-row.three>label:first-child{grid-column:1/-1;}.rehearsal-entry{grid-template-columns:1fr;gap:12px;}.rehearsal-time{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}.rehearsal-time>span{margin:0;}.rehearsal-time .text-button{margin-left:auto;}.call-submit{align-items:start;flex-direction:column;gap:8px;}.call-submit button{width:100%;}}
+@media(max-width:480px){.cast-picker{grid-template-columns:1fr;}.call-field-row{grid-template-columns:1fr;gap:0;}.call-field-row.three{gap:0 16px;}.scheduled-calls>button{grid-template-columns:1fr;gap:6px;}.callboard-date{gap:4px;}.callboard-date h2{font-size:18px;}.production-sections{gap:20px;}.production-sections button{font-size:13px;}.callboard-tools>label{flex:1;min-width:130px;}}

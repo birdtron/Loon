@@ -19,3 +19,7 @@ Use the existing Supabase project `somsipbtsjmusghfwbdu` for the Netlify migrati
 Confirm the Supabase plan's automated backup retention and point-in-time recovery availability before live production use. Establish encrypted off-site database backups and a separate Storage-object backup policy. Perform a restore drill. This first build does not configure scheduled database backups or claim that GitHub backs up live records.
 
 Personnel schema: `20261019182146_personnel_directory.sql`. Synthetic source import: `supabase/seeds/personnel-demo.sql` (idempotent, preserves existing profiles). Demo portraits and attribution are versioned under `public/headshots`; uploaded headshots live separately in the private Supabase bucket and require storage backup. Profile changes use updated_at to reject stale edits. The directory cannot create login accounts or grant roles.
+
+Cast scheduling schema: `20261019191421_cast_scheduling.sql`. Calendar events remain the canonical time/status source; `rehearsal_calls` and `rehearsal_call_cast` depend on those event IDs. Back up all three tables together. Calls are submitted via `save_rehearsal_call` in one transaction. No rehearsal test seed is applied to production. Security integration checks are in docs/cast-scheduling-security-checks.sql and roll back their fixtures.
+
+`20261019192435_parallel_rehearsal_calls.sql` replaces the duplicate-start constraint with a partial unique index for non-rehearsals. The performance seed uses that index's predicate.

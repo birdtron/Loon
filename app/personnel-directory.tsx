@@ -14,7 +14,7 @@ type Props = {
   onUpload: (person: Person, file: File) => Promise<void>;
   onOpenProduction: (id: string) => void;
 };
-function Headshot({person, getToken, large=false}: {person: Person; getToken: Props['getToken']; large?: boolean}) {
+export function Headshot({person, getToken, large=false}: {person: Person; getToken: Props['getToken']; large?: boolean}) {
   const [privateUrl, setPrivateUrl] = useState(''), [failed, setFailed] = useState(false);
   const tokenRef = useRef(getToken); tokenRef.current = getToken;
   useEffect(() => {
