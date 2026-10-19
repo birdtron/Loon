@@ -31,3 +31,5 @@ Owner email delivery and the first real login must be completed by the owner. Su
 Calendar date tests: `node --experimental-strip-types --test tests/calendar.test.mjs`. See `docs/calendar-security-checks.sql` for rollback-only database checks on an installation with a verified owner.
 
 Personnel: 56 fictional demo profiles, 63 production credits, 47 attributed portraits, production/type/department filters, profile editing, and private headshot upload/replacement. See docs/headshot-sources.md for sources and the nine profiles awaiting an authorized upload.
+
+Design changes must follow [DESIGN.md](DESIGN.md), the researched Loon design standard and release checklist.

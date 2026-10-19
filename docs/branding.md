@@ -23,3 +23,5 @@ Bold sans-serif headings, monospaced action/status text, rounded gradient panels
 The posters appear on season cards and individual production pages in their full proportions. Next.js Image provides responsive delivery. Unrecognized future production titles use a neutral fallback instead of another show's poster.
 
 This change styles the existing app. The additional departments and functions pictured in the mockups remain future work. Authentication, database authorization, performance validation, concurrency checks and AEA saves retain their existing behavior.
+
+October 2026 refinement: see ../DESIGN.md. Preserve the approved palette and source artwork. Solid navy/slate work surfaces replace repeated gradient cards; the sidebar retains the reference gradient. Source Sans 3 supports data and controls, with Newsreader reserved for page titles. Fonts are hosted locally under public/fonts with their OFL licenses. Venue information uses rows, while production artwork and optional personnel tiles retain image-based layouts. Decorative glow, floating hover cards, login rings, repeated slogans, and backend badges are removed.

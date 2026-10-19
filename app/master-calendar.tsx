@@ -47,7 +47,7 @@ export default function MasterCalendar({productions, events, onEdit, onOpenProdu
     </div>
     {view === 'calendar' ? <>
       <div className="calendar-legend"><span data-kind="Performance run">Performance run</span><span data-kind="Performance">Performance</span><span data-kind="Rehearsal">Rehearsal</span><span data-kind="Tech">Tech / Load-in</span><span data-kind="Strike">Strike</span><span data-kind="Meeting">Meeting / Other</span></div>
-      <p className="calendar-caption">30 days · Eastern time. Run bars show opening through closing; timed events show actual calls. Select a run to open its production or an event to edit it.</p>
+      <p className="calendar-caption">Eastern time · Run bars span opening to closing. Select a run for production details or a timed event to edit it.</p>
       <div className="calendar-scroll" tabIndex={0} aria-label="30-day calendar, scroll horizontally on small screens">
         <div className="calendar-grid">
           <div className="calendar-weekdays">{Array.from({length: 7}, (_, index) => <div key={index}>{displayDay(addDays(start, index), {weekday: 'short'})}</div>)}</div>
