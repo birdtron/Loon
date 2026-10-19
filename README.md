@@ -29,3 +29,5 @@ Owner email delivery and the first real login must be completed by the owner. Su
 `netlify.toml` configures `pnpm build` and `.next`. Connect this repository’s `main` branch to Netlify for automatic builds; never upload `.next` as a plain static site. No ChatGPT login is required on this version. Supabase login and database authorization still protect business records. See `docs/migration-status.md` for verified progress and remaining account setup.
 
 Calendar date tests: `node --experimental-strip-types --test tests/calendar.test.mjs`. See `docs/calendar-security-checks.sql` for rollback-only database checks on an installation with a verified owner.
+
+Personnel: 56 fictional demo profiles, 63 production credits, 47 attributed portraits, production/type/department filters, profile editing, and private headshot upload/replacement. See docs/headshot-sources.md for sources and the nine profiles awaiting an authorized upload.

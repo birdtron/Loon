@@ -16,3 +16,17 @@ export type CalendarEvent = {
 };
 export type Venue = {id: string; name: string; capacity: number; stage_style: string; description: string};
 export type ActivityDraft = Pick<CalendarEvent, 'production_id' | 'venue_id' | 'title' | 'start' | 'end' | 'event_details' | 'call_status'> & {category: ActivityCategory};
+
+export const personTypes = ['Cast', 'Creative', 'Staff', 'Crew', 'Other'] as const;
+export type PersonType = typeof personTypes[number];
+export type Person = {
+  id: string; theater_id: string; source_key: string; display_name: string; first_name: string;
+  last_name: string; known_as: string; person_types: PersonType[]; job_title: string;
+  departments: string[]; area: string; hometown: string; bio: string; favorite_shakespeare: string;
+  unions: string[]; intern: boolean; is_demo: boolean; updated_at: string;
+  headshot_kind: 'demo' | 'uploaded' | null; headshot_path: string | null;
+  headshot_source_url: string | null; headshot_credit: string | null;
+  headshot_license: string | null; headshot_license_url: string | null;
+};
+export type ProductionCredit = {id: string; theater_id: string; production_id: string; person_id: string; role: string; credit_type: PersonType; billing_order: number};
+export type PersonDraft = Pick<Person, 'display_name' | 'first_name' | 'last_name' | 'known_as' | 'person_types' | 'job_title' | 'departments' | 'area' | 'hometown' | 'bio' | 'favorite_shakespeare' | 'unions' | 'intern'>;
