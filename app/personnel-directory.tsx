@@ -1,7 +1,7 @@
 'use client';
 import {useEffect, useRef, useState} from 'react';
 import Image from 'next/image';
-import {ArrowLeft, ArrowUpRight, Camera, Check, LoaderCircle, Pencil, Search, Users, X} from 'lucide-react';
+import {ArrowLeft, ArrowUpRight, Camera, Check, LayoutGrid, List, LoaderCircle, Pencil, Search, Users, X} from 'lucide-react';
 import {SUPABASE_KEY, SUPABASE_URL} from '../lib/supabase-config';
 import {personTypes, type Person, type PersonDraft, type Production, type ProductionCredit} from '../lib/loon-types';
 import {filterPeople, initials, personName, splitLabels} from '../lib/personnel';
@@ -35,7 +35,7 @@ function Headshot({person, getToken, large=false}: {person: Person; getToken: Pr
   },[person.headshot_kind,person.headshot_path]);
   const demoSrc=person.headshot_kind==='demo'&&person.headshot_path?`/headshots/${person.headshot_path}`:'';
   return <div className={`person-headshot${large?' large':''}`}>
-    {demoSrc && !failed ? <Image src={demoSrc} alt={`${person.display_name} portrait`} width={400} height={500} sizes={large?'(max-width: 760px) 180px, 270px':'(max-width: 480px) 90vw, (max-width: 1100px) 40vw, 240px'} onError={()=>setFailed(true)}/> : privateUrl && !failed ?
+    {demoSrc && !failed ? <Image src={demoSrc} alt={`${person.display_name} portrait`} width={400} height={500} sizes={large?'(max-width: 760px) 180px, 270px':'(max-width: 480px) 45vw, 200px'} onError={()=>setFailed(true)}/> : privateUrl && !failed ?
       // Authenticated object URLs are downloaded with the owner's session above.
       // eslint-disable-next-line @next/next/no-img-element
       <img src={privateUrl} alt={`${person.display_name} headshot`} loading="lazy"/> : <div className="headshot-placeholder"><Users size={44}/><strong>{initials(person.display_name)}</strong><span>{person.headshot_kind==='uploaded'&&!failed?'Loading headshot…':'Headshot needed'}</span></div>}
@@ -63,6 +63,9 @@ function ProfileEditor({person,onClose,onSave}: {person:Person;onClose:()=>void;
 }
 export default function PersonnelDirectory({people,credits,productions,productionFilter,onProductionFilterChange,getToken,onSave,onUpload,onOpenProduction}:Props) {
   const [query,setQuery]=useState(''),[type,setType]=useState(''),[department,setDepartment]=useState(''),[selectedId,setSelectedId]=useState<string|null>(null),[editing,setEditing]=useState(false),[uploading,setUploading]=useState(false),[error,setError]=useState('');
+  const [view,setView]=useState<'tiles'|'list'>('tiles');
+  useEffect(()=>{try{if(localStorage.getItem('loon.personnelView')==='list')setView('list');}catch{}},[]);
+  function changeView(next:'tiles'|'list'){setView(next);try{localStorage.setItem('loon.personnelView',next);}catch{}}
   const uploadInput=useRef<HTMLInputElement>(null);
   const selected=people.find(person=>person.id===selectedId);
   const departments=[...new Set(people.flatMap(person=>person.departments))].sort();
@@ -78,8 +81,8 @@ export default function PersonnelDirectory({people,credits,productions,productio
   </section>;
   return <section className="personnel-directory"><div className="page-heading"><div><div className="eyebrow">ORLANDO SHAKES / PEOPLE</div><h1>Personnel</h1><p>Your cast, creatives, and company, connected across productions.</p></div><span className="pill">{people.length} people</span></div>{people.some(person=>person.is_demo)&&testNotice}
     <div className="personnel-controls"><label>Personnel type<select value={type} onChange={e=>setType(e.target.value)}><option value="">All people</option>{personTypes.map(value=><option key={value}>{value}</option>)}</select></label><label>Production<select value={productionFilter} onChange={e=>onProductionFilterChange(e.target.value)}><option value="">All productions</option>{productions.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label><label>Department<select value={department} onChange={e=>setDepartment(e.target.value)}><option value="">All departments</option>{departments.map(value=><option key={value}>{value}</option>)}</select></label><label className="search"><Search size={16}/><input aria-label="Find personnel" placeholder="Name, role, or department…" value={query} onChange={e=>setQuery(e.target.value)}/></label></div>
-    <div className="section-title"><h2>{filtered.length} {filtered.length===1?'person':'people'}</h2>{(query||type||productionFilter||department)&&<button className="text-button" onClick={()=>{setQuery('');setType('');setDepartment('');onProductionFilterChange('');}}>Clear filters</button>}</div>
-    <div className="person-grid">{filtered.map(person=>{const assignments=credits.filter(credit=>credit.person_id===person.id&&(!productionFilter||credit.production_id===productionFilter)).sort((a,b)=>a.billing_order-b.billing_order);return <button className="person-card" key={person.id} onClick={()=>{setSelectedId(person.id);setError('');}}><Headshot person={person} getToken={getToken}/><div className="person-card-body"><div className="person-card-types">{person.person_types.join(' / ')}{person.is_demo&&<span>TEST PROFILE</span>}</div><h3>{personName(person)}<ArrowUpRight size={18}/></h3>{person.known_as&&person.known_as!==person.display_name&&<p className="person-canonical-name">{person.display_name}</p>}<p className="person-card-role">{assignments.map(credit=>credit.role).join(' · ')||person.job_title||'No role assigned'}</p><div className="person-card-productions">{[...new Set(assignments.map(credit=>credit.production_id))].map(id=><span key={id}>{productions.find(p=>p.id===id)?.title}</span>)}</div></div></button>;})}</div>
+    <div className="section-title personnel-results"><h2>{filtered.length} {filtered.length===1?'person':'people'}</h2>{(query||type||productionFilter||department)&&<button className="text-button" onClick={()=>{setQuery('');setType('');setDepartment('');onProductionFilterChange('');}}>Clear filters</button>}<div className="personnel-view-switch" role="group" aria-label="Personnel view"><button aria-pressed={view==='tiles'} onClick={()=>changeView('tiles')}><LayoutGrid size={15}/>Tiles</button><button aria-pressed={view==='list'} onClick={()=>changeView('list')}><List size={15}/>List</button></div></div>
+    <div className={`person-grid personnel-${view}`}>{filtered.map(person=>{const assignments=credits.filter(credit=>credit.person_id===person.id&&(!productionFilter||credit.production_id===productionFilter)).sort((a,b)=>a.billing_order-b.billing_order);return <button className="person-card" key={person.id} onClick={()=>{setSelectedId(person.id);setError('');}}><Headshot person={person} getToken={getToken}/><div className="person-card-body"><div className="person-card-types">{person.person_types.join(' / ')}{person.is_demo&&<span>TEST PROFILE</span>}</div><h3>{personName(person)}<ArrowUpRight size={18}/></h3>{person.known_as&&person.known_as!==person.display_name&&<p className="person-canonical-name">{person.display_name}</p>}<p className="person-card-role">{assignments.map(credit=>credit.role).join(' · ')||person.job_title||'No role assigned'}</p><div className="person-card-productions">{[...new Set(assignments.map(credit=>credit.production_id))].map(id=><span key={id}>{productions.find(p=>p.id===id)?.title}</span>)}</div></div></button>;})}</div>
     {filtered.length===0&&<div className="empty"><Users/><h2>No people match these filters.</h2><p>Try another name, production, or department.</p></div>}
   </section>;
 }
