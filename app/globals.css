@@ -723,3 +723,6 @@ form .cast-option { display:flex; gap:10px; align-items:center; padding:12px 8px
 .settings-fields .text-button { padding:8px 0; }
 .account .account-profile { padding:0; margin-left:0; }
 .settings-member-list > button:hover { background:#d0f4f40a; }
+
+/* Stage reports use the same compact working forms as cast scheduling. */
+.report-tools{display:flex;align-items:end;gap:18px;flex-wrap:wrap;margin:24px 0}.report-tools label{min-width:190px;margin:0}.report-form{max-width:920px}.report-form fieldset{min-width:0}.report-runtime{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,#d8e0e5);padding-top:15px}.report-runtime strong{font-size:21px}.report-runtime small{color:var(--muted,#63717c)}.report-add-cast{margin-top:18px}.report-add-cast summary{cursor:pointer;font-weight:600;margin-bottom:14px}.stage-reports .scheduled-calls strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.report-form input[type=datetime-local]{min-width:0;width:100%}.report-form .call-field-row{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}@media(max-width:600px){.report-tools{align-items:stretch}.report-tools label{width:100%}.report-form .call-field-row{grid-template-columns:1fr}.stage-management .production-sections{flex-wrap:wrap}}
