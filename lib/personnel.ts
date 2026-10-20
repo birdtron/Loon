@@ -16,3 +16,5 @@ export function validateHeadshot(file: {size: number; type: string}) {
   if (!['image/jpeg','image/png','image/webp'].includes(file.type)) throw Error('Choose a JPG, PNG, or WebP image.');
   if (!file.size || file.size>4*1024*1024) throw Error('Choose an image smaller than 4 MB.');
 }
+
+export function portraitName(person: Pick<Person, 'known_as' | 'first_name' | 'display_name'>) { return person.known_as.trim() || person.first_name.trim() || person.display_name.trim().split(/\s+/)[0]; }

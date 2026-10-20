@@ -11,3 +11,11 @@ The server pulls the deduplicated called cast from published rehearsal calls mat
 Saving is atomic and idempotent on retry. Revision checks prevent overwriting another editor. A report retains its date when its linked performance is rescheduled. The report itself does not cancel or reschedule calendar events.
 
 Validation: `tests/reports.test.mjs` covers date boundaries, deduplication, canceled calls, timing order, fight calls, cancellation and penalty details. `docs/reports-security-checks.sql` runs transactional rollback checks for authorized saving, cast privacy, read-only staff, assigned scope, explicit denies, duplicate reports, stale edits, invalid cast, snapshot preservation, historical dates and anonymous/direct-write restrictions. No test records are retained.
+
+## Show-critical rehearsal notes
+
+The report starts with a show-critical question and conditional note. Saving publishes only this note to the production’s callboard; private report contents remain restricted. Notes remain visible across dates until Stage Manager, Assistant Stage Manager, Company Manager, or an administrator with report editing access resolves them. Resolution checks the note revision to prevent stale actions. Changing a resolved note’s text reopens it; ordinary report edits do not. An unresolved warning cannot be cleared by toggling the report flag off.
+
+Email delivery is deferred at the owner’s request on October 20, 2026. When implemented, recipients are everyone in Creative credits for that production. Select and configure the email provider/sender later; no email is sent by this release.
+
+Validation: docs/critical-notes-security-checks.sql checks assigned cast visibility, report privacy, unassigned denial, stage-management resolution, stale revisions, invalid notes, direct-write denial, reopening and anonymous denial inside a rolled-back transaction.

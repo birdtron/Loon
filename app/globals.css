@@ -1,3 +1,4 @@
+@font-face { font-family: 'Geist'; src: url('/fonts/geist-latin.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Loon Sans'; src: url('/fonts/source-sans-3-400.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Loon Sans'; src: url('/fonts/source-sans-3-600.ttf') format('truetype'); font-weight: 500 900; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Loon Display'; src: url('/fonts/newsreader-400.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
@@ -17,7 +18,7 @@
   --gradient: linear-gradient(135deg, #24365c 18%, #597198 100%);
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Loon Sans', Arial, sans-serif; font-size: 14px; background: var(--navy); color: var(--body); }
+body { margin: 0; font-family: 'Geist', Arial, sans-serif; font-size: 14px; background: var(--navy); color: var(--body); }
 button, input, select, textarea { font: inherit; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; border: 0; background: none; color: inherit; }
@@ -522,11 +523,11 @@ form .check-label { display: flex; align-items: center; gap: 10px; font-weight: 
 }
 
 /* Loon design standard: production content leads; effects stay subordinate. */
-h1 { font-family: 'Loon Display', Georgia, serif; font-weight: 400; letter-spacing: -.6px; }
+h1 { font-family: 'Geist', Arial, sans-serif; font-weight: 400; letter-spacing: -.6px; }
 .eyebrow { color: var(--body); letter-spacing: 1.2px; font-size: 11px; }
 .auth-story h1 { font-size: clamp(42px,4.8vw,64px); letter-spacing: -.6px; max-width: 500px; }
 .auth-story p { max-width: 340px; }
-.auth-form h2 { font-family: 'Loon Display', Georgia, serif; font-weight: 400; font-size: 36px; }
+.auth-form h2 { font-family: 'Geist', Arial, sans-serif; font-weight: 400; font-size: 36px; }
 .auth-foot { font-size: 12px; }
 .primary, .secondary { min-height: 40px; font-size: 14px; }
 .search, .edit-button { border-radius: 6px; }
@@ -726,3 +727,44 @@ form .cast-option { display:flex; gap:10px; align-items:center; padding:12px 8px
 
 /* Stage reports use the same compact working forms as cast scheduling. */
 .report-tools{display:flex;align-items:end;gap:18px;flex-wrap:wrap;margin:24px 0}.report-tools label{min-width:190px;margin:0}.report-form{max-width:920px}.report-form fieldset{min-width:0}.report-runtime{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,#d8e0e5);padding-top:15px}.report-runtime strong{font-size:21px}.report-runtime small{color:var(--muted,#63717c)}.report-add-cast{margin-top:18px}.report-add-cast summary{cursor:pointer;font-weight:600;margin-bottom:14px}.stage-reports .scheduled-calls strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.report-form input[type=datetime-local]{min-width:0;width:100%}.report-form .call-field-row{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}@media(max-width:600px){.report-tools{align-items:stretch}.report-tools label{width:100%}.report-form .call-field-row{grid-template-columns:1fr}.stage-management .production-sections{flex-wrap:wrap}}
+
+/* Shared portrait treatment and single-column rehearsal entry. */
+.stage-heading { flex-direction:column; align-items:flex-start; gap:8px; }
+.stage-heading > label { width: min(100%, 420px); }
+.cast-call-form .call-field-row, .cast-call-form .call-field-row.three { grid-template-columns:minmax(0,1fr); gap:0; }
+.cast-call-form fieldset:not(.called-cast-field) { max-width:620px; }
+.person-headshot, .person-photo-panel .person-headshot { border-radius:50%; aspect-ratio:1; }
+.personnel-tiles .person-headshot { width:112px; height:112px; margin:16px auto 0; }
+.personnel-tiles .person-card-body { text-align:center; }
+.personnel-tiles .person-card-types { justify-content:center; }
+.personnel-list .person-headshot { width:64px; height:64px; border-radius:50%; }
+.portrait-caption { text-align:center; }
+.cast-chip, form .cast-option { display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; padding:12px; gap:8px; }
+.cast-chip { width:140px; }
+.cast-chip .person-headshot, .cast-option .person-headshot { width:64px; height:64px; border-radius:50%; aspect-ratio:1; }
+.cast-chip button { position:absolute; right:2px; top:2px; }
+.cast-picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+form .cast-option { border:2px solid var(--line); border-radius:6px; }
+.cast-option[aria-pressed=true] { border-color:var(--aqua); background:#d0f4f425; }
+.cast-option[aria-pressed=true]::after { content:'Selected'; color:var(--aqua); font-size:12px; }
+.add-rehearsal { margin:20px 0; }
+
+.production-overview { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:28px; align-items:start; }
+.production-overview-main { min-width:0; }
+.production-overview-main > .demo-pill { margin-bottom:20px; }
+.production-overview .detail-grid { grid-template-columns:220px minmax(0,1fr); }
+.production-overview .detail-facts { border-left:0; border-right:1px solid var(--line); padding:0 20px 0 0; }
+.playbill { max-height:680px; overflow-y:auto; border-left:1px solid var(--line); padding-left:24px; }
+.playbill h2 { font-size:20px; }.playbill h3 { font-size:15px; margin-top:24px; }
+.playbill-credit { text-align:center; margin:18px 0; }.playbill-credit .person-headshot { width:72px; height:72px; margin:0 auto 8px; }.playbill-credit strong { font-size:13px; }
+.production-calendar > summary { cursor:pointer; font-size:20px; padding:20px 0; border-top:1px solid var(--line); }.production-calendar > summary span { margin-left:12px; }
+.performance-month { min-width:700px; display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); border-top:1px solid var(--line); border-left:1px solid var(--line); }
+.month-weekday,.month-day { border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:8px; }.month-weekday { font-size:12px; }.month-day { min-height:125px; }.outside-month { background:#0002; color:var(--muted); }.month-day time { font-size:12px; }
+.month-performance { display:flex; flex-direction:column; gap:4px; padding:8px; background:var(--panel); border:1px solid var(--line); width:100%; margin-top:8px; text-align:left; font-size:11px; }.month-performance:disabled { opacity:1; cursor:default; }.month-performance small { white-space:normal; }
+@media(max-width:1200px){.production-overview{grid-template-columns:minmax(0,1fr) 200px;}.production-overview .detail-grid{grid-template-columns:1fr;}.production-overview .detail-facts{border-right:0;border-bottom:1px solid var(--line);padding:0 0 12px;}}
+@media(max-width:760px){.production-overview{grid-template-columns:1fr;}.playbill{border-left:0;border-top:1px solid var(--line);padding:20px 0;max-height:400px;}.playbill section{display:flex;flex-wrap:wrap;gap:16px;}.playbill h3{width:100%;}.playbill-credit{width:130px;}.production-calendar .calendar-navigation{gap:8px;}.production-calendar h2{font-size:17px;}}
+
+.critical-note { border-left:4px solid var(--yellow); background:var(--panel); padding:20px; margin:20px 0; }.critical-note p { white-space:pre-wrap; }.critical-note h3 { margin-bottom:8px; }
+
+.person-portrait { text-align:center; padding:12px; }.person-portrait h3 { margin:10px 0 4px; }.personnel-list .person-portrait { width:160px; flex-shrink:0; }.personnel-list .person-portrait .person-headshot { margin:0 auto 10px; }.personnel-list .person-card-body { display:flex; flex-direction:column; align-items:flex-start; }.person-portrait .person-card-role { margin:4px 0; }.playbill .headshot-placeholder svg,.playbill .headshot-placeholder span { display:none; }
+@media(max-width:480px){.personnel-list .person-portrait{width:125px;}.personnel-list .person-card .person-portrait h3{margin:8px 0 4px;}}
