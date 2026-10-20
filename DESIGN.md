@@ -14,7 +14,7 @@ These are review constraints, not an AI detector. Familiar patterns can be usefu
 | Every section boxed into the same rounded card. | Posters get tiles, venue facts get rows, schedules get grids/tables, biographies get sections. | A, B; Loon judgment |
 | Every label, icon, and secondary fact competing at equal weight. | Give names and tasks priority; group their supporting facts nearby. | A |
 | Spacing based on visual symmetry rather than relationships. | Keep a label with its value and an action with the thing it changes. | A |
-| Arbitrary type choices, decorative monospace, or a new font per screen. | Source Sans 3 for controls/data; Newsreader for page titles. Use local licensed fonts. | B; Loon judgment |
+| Arbitrary type choices, decorative monospace, or a new font per screen. | Geist for controls, data, and page titles (user-requested October 20 update). Use local licensed fonts. | B; Loon judgment |
 | Hero slogans, repeated welcome headings, backend badges, or fake progress statistics. | Use task names, real counts, short instructions, and honest states. | C; playbook; Loon judgment |
 | Generic illustrations or invented people used to fill space. | Use supplied show posters and verified attributed portraits; mark missing photos. Keep test data clearly labeled. | Loon judgment |
 | Tiny pale labels, color-only status, invisible focus, and cramped controls. | Check contrast, keyboard focus, readable labels, text status, and target spacing. | D |

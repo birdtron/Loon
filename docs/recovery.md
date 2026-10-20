@@ -23,3 +23,11 @@ Personnel schema: `20261019182146_personnel_directory.sql`. Synthetic source imp
 Cast scheduling schema: `20261019191421_cast_scheduling.sql`. Calendar events remain the canonical time/status source; `rehearsal_calls` and `rehearsal_call_cast` depend on those event IDs. Back up all three tables together. Calls are submitted via `save_rehearsal_call` in one transaction. No rehearsal test seed is applied to production. Security integration checks are in docs/cast-scheduling-security-checks.sql and roll back their fixtures.
 
 `20261019192435_parallel_rehearsal_calls.sql` replaces the duplicate-start constraint with a partial unique index for non-rehearsals. The performance seed uses that index's predicate.
+
+## October 20 Trello batch
+
+Before this batch, a verified Git bundle and source archive preserved commit `c734ed9cc9fd444dba290630335509de7456033b`; the published Netlify deploy was `6ad6db165115afdfdc914748`. A private local snapshot captured stage report records and their save function/policies before the critical-note migration. These backups are outside the repository. They do not constitute a full Supabase/Auth/Storage backup.
+
+The batch adds `show_critical_notes`, its restricted resolution RPC, and a trigger on reports. Existing report fields and records are retained. Email delivery is deliberately deferred; future recipients are the production’s Creative credits. Source history preserves the prior application; any recovery involving new critical notes must preserve their current records before changing the schema.
+
+Verification: 19 existing unit tests, TypeScript and production build passed; database report/call and critical-note security suites passed in rolled-back transactions. Browser checks use synthetic data and cover month/list views, editing, persistent cast selection, critical-note resolution, and 390px layout. Supabase security review found an existing account setting warning: leaked-password protection is disabled; no table/RLS findings.
