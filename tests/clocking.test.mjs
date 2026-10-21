@@ -24,3 +24,15 @@ test('chart groups conserve hours without multiplying multi-department people',(
  assert.deepEqual(laborGroups(rows,'personnel'),[{label:'A',minutes:210},{label:'B',minutes:30}]);
  assert.deepEqual(laborGroups([],'production'),[]);
 });
+
+test('pill filters support combined selections, no selection, and demo isolation',async()=>{
+ const {filterLabor,toggleLaborPill}=await import('../lib/clocking.ts');
+ const rows=[{person_id:'a',personnel:'A',production_id:'one',production:'One',department:'Scenic',minutes:120,is_demo:true},{person_id:'b',personnel:'B',production_id:'two',production:'Two',department:'Audio',minutes:180,is_demo:false},{person_id:'a',personnel:'A',production_id:'two',production:'Two',department:'Audio',minutes:60,is_demo:true}];
+ const all={production:null,personnel:null,department:null};
+ assert.equal(filterLabor(rows,all).length,3);
+ assert.equal(filterLabor(rows,{...all,production:['two'],personnel:['a']}).reduce((sum,r)=>sum+r.minutes,0),60);
+ assert.equal(filterLabor(rows,{...all,production:['one','two'],department:['Audio']}).reduce((sum,r)=>sum+r.minutes,0),240);
+ assert.equal(filterLabor(rows,{...all,production:[]}).length,0);
+ assert.equal(filterLabor(rows,all,false).reduce((sum,r)=>sum+r.minutes,0),180);
+ assert.deepEqual(toggleLaborPill(null,'one'),['one']);assert.deepEqual(toggleLaborPill(['one'],'two'),['one','two']);assert.deepEqual(toggleLaborPill(['one'],'one'),[]);
+});
