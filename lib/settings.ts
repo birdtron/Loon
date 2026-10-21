@@ -25,4 +25,4 @@ export function permissionFor(member:Pick<Member,'roles'|'overrides'|'production
  }
  return member.overrides[module]||level;
 }
-export function initialWorkspaceTab(c:Pick<SettingsContext,'theater_id'|'account'|'permissions'>){if(!c.theater_id)return 'Onboarding';const landing=c.account.landing||defaultAccount.landing;const module=({Productions:'productions',Schedule:'calendar',Personnel:'personnel',Callboard:'stage'} as Record<string,Module>)[landing];return module&&c.permissions[module]!=='none'?landing:'Settings';}
+export function initialWorkspaceTab(c:Pick<SettingsContext,'theater_id'|'account'|'permissions'>){if(!c.theater_id)return 'Onboarding';const landing=c.account.landing||defaultAccount.landing;const landingModule=({Productions:'productions',Schedule:'calendar',Personnel:'personnel',Callboard:'stage'} as Record<string,Module>)[landing];return landingModule&&c.permissions[landingModule]!=='none'?landing:'Settings';}
