@@ -31,7 +31,7 @@ function status(p:Production){const day=wall(new Date().toISOString()).slice(0,1
 
 function BrandLogo(){return <span className="brand-logo"><Image src="/brand/loon-logo.png" alt="Loon" width={1080} height={1080} priority /></span>;}
 function poster(p:Production){return p.title==='Titus Andronicus'?'/posters/titus-andronicus.png':p.title==='Romeo and Juliet'?'/posters/romeo-and-juliet.png':p.import_metadata?.test_seed==='les-mis-demo-v1'?'/posters/les-miserables.png':null;}
-function ProductionPoster({production,detail=false}:{production:Production;detail?:boolean}){const src=poster(production);return <div className={detail?'detail-poster':'show-art'}>{src?<Image src={src} alt={`${production.title} show poster`} width={1080} height={1920} sizes={detail?'(max-width: 640px) 120px, 170px':'(max-width: 640px) 100vw, (max-width: 1100px) 40vw, 320px'} className="poster-image" />:<div className="poster-fallback"><Theater/><span>{production.title}</span></div>}</div>;}
+function ProductionPoster({production,detail=false}:{production:Production;detail?:boolean}){const src=poster(production);return <div className={detail?'detail-poster':'show-art'}>{src?<Image src={src} alt={`${production.title} show poster`} width={1080} height={1920} sizes={detail?'(max-width: 640px) 120px, 170px':'(max-width: 360px) 220px, (max-width: 480px) 50vw, 240px'} className="poster-image" />:<div className="poster-fallback"><Theater/><span>{production.title}</span></div>}</div>;}
 
 export default function Loon(){
  const [session,setSession]=useState<Session|null>(null),[ready,setReady]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
