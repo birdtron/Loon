@@ -5,7 +5,7 @@ export type Production = {
   content_warnings: string[]; series: string | null; is_aea: boolean | null;
   aea_tier: string | null; rehearsal_start: string | null;
   scripts?: {musical: boolean; composer: string | null} | null;
-  import_metadata?: {test_seed?: string};
+  import_metadata?: {test_seed?: string; script_musical?: boolean; script_composer?: string};
   venues: {name: string} | null; seasons: {name: string} | null;
 };
 export const activityCategories = ['Rehearsal', 'Tech', 'Load-in', 'Strike', 'Meeting', 'Other'] as const;
