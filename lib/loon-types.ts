@@ -4,6 +4,8 @@ export type Production = {
   runtime: string; runtime_minutes: number; rating: string;
   content_warnings: string[]; series: string | null; is_aea: boolean | null;
   aea_tier: string | null; rehearsal_start: string | null;
+  scripts?: {musical: boolean; composer: string | null} | null;
+  import_metadata?: {test_seed?: string};
   venues: {name: string} | null; seasons: {name: string} | null;
 };
 export const activityCategories = ['Rehearsal', 'Tech', 'Load-in', 'Strike', 'Meeting', 'Other'] as const;
