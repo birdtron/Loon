@@ -41,3 +41,5 @@ Settings are available from the gear beside the lower-left profile icon. Include
 Production CSV imports are prepared under Settings → Imports & Data Configurations. Live October 20, 2026. See [import workflow and verification](docs/imports/README.md).
 
 Personnel intake and the Company Management approval dashboard are live. Individual intake links collect profiles and private contact details into a holding queue; approval adds personnel, credits and season membership atomically. Uses all 14 supplied bird icons. See [workflow, authorization and validation](docs/intake/README.md). Production release: 6ad7fddfc569e0deb297e729.
+
+Company Management now issues email-bound login invitations. New personnel sign in to complete intake and receive assigned workspace access after approval. See [onboarding workflow and validation](docs/onboarding/README.md).

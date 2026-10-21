@@ -10,7 +10,7 @@ export type CalendarTemplate={id:string;name:string;anchor:'opening'|'closing';o
 export type StageSettings={start:string;end:string;location:string;departments:string[]};
 export type TheaterSettings={name:string;timezone:string;contact_email:string;phone:string;logo:string;current_season_id:string};
 export type WorkspaceSettings={theater_id:string;revision:number;theater:TheaterSettings;stage:StageSettings;templates:CalendarTemplate[]};
-export type SettingsContext={user_id:string;thanos:boolean;theaters:{id:string;name:string;timezone:string}[];theater_id:string|null;member:Member|null;account:Account;account_revision:number;settings:WorkspaceSettings|null;seasons:{id:string;name:string}[];members:Member[];admin:boolean;delegated:string[];permissions:Record<Module,Permission>};
+export type SettingsContext={user_id:string;read_only?:boolean;thanos:boolean;theaters:{id:string;name:string;timezone:string}[];theater_id:string|null;member:Member|null;account:Account;account_revision:number;settings:WorkspaceSettings|null;seasons:{id:string;name:string}[];members:Member[];admin:boolean;delegated:string[];permissions:Record<Module,Permission>};
 export function templateDates(template:CalendarTemplate,production:{opening_date:string;closing_date:string}){const start=addDays(template.anchor==='opening'?production.opening_date:production.closing_date,template.offset);return {start,end:addDays(start,template.duration-1)};}
 export function permissionFor(member:Pick<Member,'roles'|'overrides'|'production_ids'>,module:Module,productionId?:string):Permission{
  if(member.roles.includes('Super Admin'))return 'edit';
@@ -25,3 +25,4 @@ export function permissionFor(member:Pick<Member,'roles'|'overrides'|'production
  }
  return member.overrides[module]||level;
 }
+export function initialWorkspaceTab(c:Pick<SettingsContext,'theater_id'|'account'|'permissions'>){if(!c.theater_id)return 'Onboarding';const landing=c.account.landing||defaultAccount.landing;const module=({Productions:'productions',Schedule:'calendar',Personnel:'personnel',Callboard:'stage'} as Record<string,Module>)[landing];return module&&c.permissions[module]!=='none'?landing:'Settings';}
