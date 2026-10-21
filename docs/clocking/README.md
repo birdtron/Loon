@@ -1,6 +1,6 @@
 # Clocking and Production Labor
 
-Personnel select their production, department and role, optionally add notes, and tap **Clock in**. Supabase records the current date/time. **Clock out** records the finish date/time and finalizes the hours. There are no manual date/time or unpaid-break fields, and clients cannot submit timestamps or breaks to the punch API.
+Personnel select their production and department, optionally add notes, and tap **Clock in**. Supabase records the current date/time. **Clock out** records the finish date/time and finalizes the hours. The reporting role is filled from the personnel job title, with Personnel as the fallback; Clocking has no role input. There are no manual date/time or unpaid-break fields, and clients cannot submit timestamps or breaks to the punch API.
 
 An active clock-in is stored in the database, survives refresh/sign-out, and is visible when the same person returns on another device. There can be only one active shift per person across productions. Repeated requests with the same clock-in ID or clock-out ID return the existing punch instead of double-counting. The history and Production Labor report include completed shifts; active shifts display their start timestamp and estimated elapsed hours separately. Server timestamps determine final totals. Overnight shifts use the theater-local clock-in date and can be finished even after more than 24 hours. This screen provides time tracking, not payroll or agreement-rule calculations.
 
@@ -17,4 +17,4 @@ The table is private with RLS, a deny-direct policy and no browser table grants.
 - `pnpm build`
 - Install `@electric-sql/pglite@0.3.14` in an isolated test directory, make it resolvable, then run `node docs/clocking/postgres-qa.mjs`. It tests the actual migrations in an in-memory PostgreSQL instance, with no production test data.
 
-Production Labor has inclusive clock-in-date filters, production/personnel/department filters, chart grouping, an accessible chart description and legend, and a totals table. A person's multiple directory departments or production credits never multiply their hours.
+Production Labor keeps its inclusive clock-in-date range at the top. Production/personnel/department filters and chart grouping sit in a square-edged section on the right, stacking above results on smaller screens. The results include an accessible chart description and legend, and a totals table. A person's multiple directory departments or production credits never multiply their hours.
