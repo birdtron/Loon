@@ -25,3 +25,5 @@ test('calendar template offsets and inclusive duration cross year boundaries',()
 test('theater timezone and personal time format affect input and display consistently',()=>{
  try{configureCalendar('America/Los_Angeles','24');assert.equal(toUTC('2026-10-19T18:00'),'2026-10-20T01:00:00.000Z');assert.equal(displayTime('2026-10-20T01:00:00Z'),'18:00');assert.equal(localDay('2026-10-20T01:00:00Z'),'2026-10-19');}finally{configureCalendar('America/New_York','12');}
 });
+
+test('limited accounts land on onboarding before workspace settings and approved members honor their landing permission',async()=>{const {initialWorkspaceTab,defaultAccount}=await import('../lib/settings.ts');const c={theater_id:null,account:defaultAccount,permissions:{productions:'none',calendar:'none',personnel:'none',venues:'none',stage:'none'}};assert.equal(initialWorkspaceTab(c),'Onboarding');assert.equal(initialWorkspaceTab({...c,theater_id:'theater',permissions:{...c.permissions,productions:'view'}}),'Productions');assert.equal(initialWorkspaceTab({...c,theater_id:'theater'}),'Settings');});

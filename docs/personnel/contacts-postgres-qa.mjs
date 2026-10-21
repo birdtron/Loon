@@ -1,0 +1,32 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const root=new URL('../../',import.meta.url).pathname.replace(/\/$/,'');const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create schema auth;create schema private;grant usage on schema auth,private,public to authenticated;
+create table auth.users(id uuid primary key,email_confirmed_at timestamptz default now(),deleted_at timestamptz,is_anonymous boolean default false,is_owner boolean default false);
+create function auth.uid() returns uuid language sql as $$select nullif(current_setting('qa.uid',true),'')::uuid$$;
+create function private.has_thanos() returns boolean language sql security definer set search_path='' as $$select coalesce((select is_owner from auth.users where id=auth.uid()),false)$$;
+create table private.workspace_members(theater_id uuid,user_id uuid,active boolean,roles text[],overrides jsonb default '{}',production_ids uuid[] default '{}');
+create table private.settings_history(theater_id uuid,actor uuid,section text);`);
+await db.exec(await readFile(root+'/supabase/migrations/20261019170000_core.sql','utf8'));
+await db.exec((await readFile(root+'/supabase/migrations/20261019182146_personnel_directory.sql','utf8')).split('-- New uploaded headshots')[0]);
+const settings=await readFile(root+'/supabase/migrations/20261019194053_workspace_settings.sql','utf8');
+for(const name of ['verified_user','workspace_admin','workspace_permission'])await db.exec(settings.match(new RegExp('create function private\\.'+name+'\\([\\s\\S]*?\\$\\$;'))[0]);
+await db.exec(await readFile(root+'/supabase/migrations/20261020165850_personnel_contacts.sql','utf8'));
+const t='11111111-1111-1111-1111-111111111111',p='22222222-2222-2222-2222-222222222222',u='33333333-3333-3333-3333-333333333333',other='44444444-4444-4444-4444-444444444444',p2='55555555-5555-5555-5555-555555555555';
+await db.exec(`insert into auth.users(id) values('${u}');set qa.uid='${u}';insert into public.theaters(id,slug,name) values('${t}','qa','QA'),('${other}','other','Other');insert into public.people(id,theater_id,source_key,display_name) values('${p}','${t}','qa','QA Person'),('${p2}','${other}','qa','Other Person');insert into private.workspace_members(theater_id,user_id,active,roles) values('${t}','${u}',true,array['Stage Manager']);set role authenticated;`);
+const get=async(id=p)=>(await db.query('select public.get_personnel_contact($1) result',[id])).rows[0].result;
+const draft={email:' person@example.invalid ',address_line_1:'123 Example Lane',address_line_2:' Apt 2B ',city:'Example',state:'MA',zip:'02108',emergency_contact_name:'Emergency Example',emergency_contact_phone:'+44 (0)20 1234 5678'};
+const save=async(d=draft,expected=0,id=p)=>(await db.query('select public.save_personnel_contact($1,$2,$3) result',[id,JSON.stringify(d),expected])).rows[0].result;
+assert.equal((await get()).revision,0);const saved=await save();assert.equal(saved.revision,1);assert.equal(saved.address_line_2,'Apt 2B');assert.equal(saved.zip,'02108');assert.equal(saved.email,'person@example.invalid');
+await assert.rejects(()=>save(),/changed/);await assert.rejects(()=>save({...draft,email:'bad'},1),/valid email/);await assert.rejects(()=>save({...draft,city:'x'.repeat(121)},1),/too long/);await assert.rejects(()=>save({...draft,theater_id:other},1),/Unknown/);await assert.rejects(()=>get(p2),/access required/);await assert.rejects(()=>save(draft,0,p2),/access required/);
+await assert.rejects(()=>db.query('select * from private.personnel_contacts'),/permission denied/);const publicColumns=(await db.query("select column_name from information_schema.columns where table_schema='public' and table_name='people'")).rows;assert.ok(!publicColumns.some(c=>c.column_name==='email'||c.column_name==='address_line_1'));
+for(const role of ['Stage Manager','Assistant Stage Manager','Company Manager']){await db.exec(`reset role;update private.workspace_members set roles=array['${role}'];set role authenticated;`);assert.equal((await get()).revision,1);}
+for(const role of ['Cast','Guest','Director','Marketing','Box Office','Production','Production Manager']){await db.exec(`reset role;update private.workspace_members set roles=array['${role}'];set role authenticated;`);await assert.rejects(()=>get(),/access required/);await assert.rejects(()=>save(draft,1),/access required/);}
+await db.exec(`reset role;update private.workspace_members set roles=array['Stage Manager'],overrides='{"stage":"none"}';set role authenticated;`);await assert.rejects(()=>get(),/access required/);
+await db.exec(`reset role;update private.workspace_members set overrides='{}',active=false;set role authenticated;`);await assert.rejects(()=>get(),/access required/);
+await db.exec(`reset role;update private.workspace_members set active=true;update auth.users set email_confirmed_at=null;set role authenticated;`);await assert.rejects(()=>get(),/access required/);
+await db.exec(`reset role;update auth.users set email_confirmed_at=now();update private.workspace_members set roles=array['Super Admin'];set role authenticated;`);const cleared=await save(Object.fromEntries(Object.keys(draft).map(k=>[k,''])),1);assert.equal(cleared.revision,2);assert.equal(cleared.email,'');
+await db.exec(`reset role;update auth.users set is_owner=true;set role authenticated;`);assert.equal((await get()).revision,2);
+await db.exec(`reset role;`);assert.equal((await db.query("select has_function_privilege('anon','public.get_personnel_contact(uuid)','execute') allowed")).rows[0].allowed,false);assert.equal((await db.query("select has_function_privilege('anon','public.save_personnel_contact(uuid,jsonb,integer)','execute') allowed")).rows[0].allowed,false);
+console.log('Contact PostgreSQL checks passed: actual role predicates, create/read/update/clear, text/length validation, stale writes, cross-theater denial, role denial, suspension, unverified denial, private-table denial and no directory exposure.');await db.close();

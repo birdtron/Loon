@@ -1,0 +1,36 @@
+// Run with PGlite available through a temporary test installation; never targets live data.
+import {PGlite} from '@electric-sql/pglite';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const root=new URL('../../',import.meta.url).pathname.replace(/\/$/,'');
+const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create schema auth;create schema private;
+create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql as $$select nullif(current_setting('qa.uid',true),'')::uuid$$;
+create function private.has_thanos() returns boolean language sql as $$select current_setting('qa.admin',true)='yes'$$;
+create function private.verified_user() returns boolean language sql as $$select auth.uid() is not null$$;
+create function private.workspace_admin(t uuid) returns boolean language sql as $$select private.has_thanos() and t='11111111-1111-1111-1111-111111111111'::uuid$$;
+create table private.settings_history(theater_id uuid,actor uuid,section text);`);
+await db.exec(await readFile(root+'/supabase/migrations/20261019170000_core.sql','utf8'));
+await db.exec(await readFile(root+'/supabase/migrations/20261020153932_production_imports.sql','utf8'));
+const t='11111111-1111-1111-1111-111111111111',u='22222222-2222-2222-2222-222222222222';
+await db.exec(`set qa.uid='${u}';set qa.admin='yes'; insert into auth.users values('${u}');insert into public.theaters(id,slug,name) values('${t}','qa','QA Theater');insert into public.seasons(theater_id,name) values('${t}','26-27 Season');insert into public.venues(theater_id,name) values('${t}','Margeson Theater');`);
+const data=[{title:'QA New Show',season_name:'26-27 Season',opening_date:'2027-01-10',closing_date:'02/10/2027',venue_name:'Margeson Theater',script_playwright:'A. Writer',script_musical:'No',runtime_minutes:'135',content_warnings:'Violence|Haze|Violence'}];
+const rpc=async(rows=data,commit=false,expected=null,theater=t)=>(await db.query('select public.import_productions($1,$2,$3,$4) result',[theater,JSON.stringify(rows),commit,expected])).rows[0].result;
+const count=async(table='productions')=>(await db.query(`select count(*)::int n from public.${table}`)).rows[0].n;
+const pre=await rpc();assert.equal(pre.rows[0].script,'Create script');assert.equal(await count(),0);assert.equal(await count('scripts'),0);
+for(const [patch,message] of [[{season_name:'Missing'},/Season or venue/],[{venue_name:'Elsewhere'},/Season or venue/],[{opening_date:'02/30/2027'},/date/],[{closing_date:'2026-01-01'},/Closing/],[{runtime_minutes:'0'},/runtime_minutes/],[{script_playwright:''},/Playwright/],[{import_status:'invalid'},/import_status/],[{theater_id:t},/Unknown column/],[{hero_image_url:'javascript:alert(1)'},/URL/]])await assert.rejects(()=>rpc([{...data[0],...patch}]),message);
+await assert.rejects(()=>rpc([...data,...data]),/Duplicate/);
+await assert.rejects(()=>rpc(data,true,'stale'),/Data changed/);
+await db.exec("set qa.admin='no'");await assert.rejects(()=>rpc(),/administrator/);await db.exec("set qa.admin='yes'");
+await assert.rejects(()=>rpc(data,false,null,'33333333-3333-3333-3333-333333333333'),/administrator/);
+await db.exec("set qa.uid=''");await assert.rejects(()=>rpc(),/administrator/);await db.exec(`set qa.uid='${u}'`);
+const preview=await rpc();const result=await rpc(data,true,preview.fingerprint);assert.equal(result.created,1);assert.equal(await count(),1);assert.equal(await count('scripts'),1);
+const production=(await db.query('select * from public.productions')).rows[0];assert.equal(production.is_demo,false);assert.equal(production.publish,false);assert.equal(production.runtime_minutes,135);assert.equal(production.content_warnings.length,2);
+await assert.rejects(()=>rpc(),/already exists/);
+const reuse=[{...data[0],season_name:'27-28 Season'}];await db.exec(`insert into public.seasons(theater_id,name) values('${t}','27-28 Season')`);assert.equal((await rpc(reuse)).rows[0].script,'Use existing script');await assert.rejects(()=>rpc([{...reuse[0],script_playwright:'Wrong'}]),/conflict/);
+const valid={...data[0],title:'Another QA Show'},invalid={...data[0],title:'Bad QA Show',venue_name:'Unknown'};await assert.rejects(()=>rpc([valid,invalid]),/CSV row 3/);assert.equal(await count(),1);
+// Force a late insert failure and confirm the entire transaction is rolled back.
+await db.exec(`create function public.qa_fail() returns trigger language plpgsql as $$begin if new.title='Late Failure' then raise exception 'late failure';end if;return new;end$$;create trigger qa_fail before insert on public.productions for each row execute function public.qa_fail();`);
+const batch=[valid,{...data[0],title:'Late Failure'}];const bp=await rpc(batch);await assert.rejects(()=>rpc(batch,true,bp.fingerprint),/late failure/);assert.equal(await count(),1);assert.equal(await count('scripts'),1);
+assert.equal((await db.query("select has_function_privilege('anon','public.import_productions(uuid,jsonb,boolean,text)','execute') allowed")).rows[0].allowed,false);
+console.log('Local PostgreSQL checks passed: migration syntax, read-only preview, authorization, dates, missing/cross-theater references, duplicate/conflict rejection, stale preview, real-data flags, script reuse and full rollback after late insert failure.');await db.close();

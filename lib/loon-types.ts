@@ -1,9 +1,11 @@
 export type Production = {
   id: string; theater_id: string; season_id: string; venue_id: string | null; title: string;
   full_description: string; opening_date: string; closing_date: string;
-  runtime: string; runtime_minutes: number; rating: string;
+  runtime: string; runtime_minutes: number; rating: string; is_demo: boolean;
   content_warnings: string[]; series: string | null; is_aea: boolean | null;
   aea_tier: string | null; rehearsal_start: string | null;
+  scripts?: {musical: boolean; composer: string | null} | null;
+  import_metadata?: {test_seed?: string};
   venues: {name: string} | null; seasons: {name: string} | null;
 };
 export const activityCategories = ['Rehearsal', 'Tech', 'Load-in', 'Strike', 'Meeting', 'Other'] as const;
@@ -24,6 +26,7 @@ export type Person = {
   last_name: string; known_as: string; person_types: PersonType[]; job_title: string;
   departments: string[]; area: string; hometown: string; bio: string; favorite_shakespeare: string;
   unions: string[]; intern: boolean; is_demo: boolean; updated_at: string;
+  profile_avatar?: string | null; intake_headshot?: boolean;
   headshot_kind: 'demo' | 'uploaded' | null; headshot_path: string | null;
   headshot_source_url: string | null; headshot_credit: string | null;
   headshot_license: string | null; headshot_license_url: string | null;

@@ -18,3 +18,5 @@ export function validateHeadshot(file: {size: number; type: string}) {
 }
 
 export function portraitName(person: Pick<Person, 'known_as' | 'first_name' | 'display_name'>) { return person.known_as.trim() || person.first_name.trim() || person.display_name.trim().split(/\s+/)[0]; }
+
+export function peopleInSeason(people:Person[],seasonCredits:ProductionCredit[],season:string,memberships:{person_id:string;season_id:string}[]){return people.filter(p=>!season||seasonCredits.some(c=>c.person_id===p.id)||memberships.some(m=>m.person_id===p.id&&m.season_id===season)||(!memberships.some(m=>m.person_id===p.id)&&(!p.person_types.includes('Cast')||p.person_types.some(t=>t!=='Cast'))));}
