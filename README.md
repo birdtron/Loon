@@ -37,3 +37,7 @@ Design changes must follow [DESIGN.md](DESIGN.md), the researched Loon design st
 Cast Scheduling: open a production → Stage Management → Cast Scheduling. Set the date/time, act/scene and work, location, and called cast; Submit to callboard publishes the rehearsal to that date and the master calendar. Edit or cancel calls from the production's Callboard or Scheduled calls. The main Callboard supports date and show filters.
 
 Settings are available from the gear beside the lower-left profile icon. Includes personal preferences, theater identity/current season/timezone, email access reservations and role/delegation controls, rehearsal defaults, and reusable calendar templates. Reservations send no emails. Calendar templates preview dates and create draft activities without changing existing schedules. See `docs/architecture.md` and the rollback-only `docs/settings-security-checks.sql`.
+
+Production CSV imports are prepared under Settings → Imports & Data Configurations. Live October 20, 2026. See [import workflow and verification](docs/imports/README.md).
+
+Personnel intake and the Company Management approval dashboard are live. Individual intake links collect profiles and private contact details into a holding queue; approval adds personnel, credits and season membership atomically. Uses all 14 supplied bird icons. See [workflow, authorization and validation](docs/intake/README.md). Production release: 6ad7fddfc569e0deb297e729.
