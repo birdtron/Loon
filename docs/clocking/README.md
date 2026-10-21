@@ -18,3 +18,9 @@ The table is private with RLS, a deny-direct policy and no browser table grants.
 - Install `@electric-sql/pglite@0.3.14` in an isolated test directory, make it resolvable, then run `node docs/clocking/postgres-qa.mjs`. It tests the actual migrations in an in-memory PostgreSQL instance, with no production test data.
 
 Production Labor keeps its inclusive clock-in-date range at the top. Production/personnel/department filters and chart grouping sit in a square-edged section on the right, stacking above results on smaller screens. The results include an accessible chart description and legend, and a totals table. A person's multiple directory departments or production credits never multiply their hours.
+
+## Demo labor preview
+
+`supabase/seeds/clocking-demo.sql` adds 40 completed sample shifts totaling 137.5 hours across three demo productions, eight existing fictional personnel and seven departments, dated October 16–20, 2026. Every row is marked `is_demo`, clearly described in notes and labeled in the report. System-generated fixtures have no claimed human audit actor; real punches still require creator/updater identity. The seed is idempotent and skips conflicts with existing staff time.
+
+Highlighted filter pills support multiple selections within production, personnel and department; selections combine across groups. All resets a group, while deselecting every individual option returns no results. Hours by selects one chart breakdown. Include demo / Recorded only controls whether labeled demo records contribute to totals. Dates stay at the top; the filter section and totals table have 6px corners to match the rest of the page.
