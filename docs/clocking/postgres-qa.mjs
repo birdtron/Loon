@@ -50,4 +50,26 @@ await db.exec(`reset role;update auth.users set read_only=true;set role authenti
 await assert.rejects(()=>rpc('get_clock_entries',[other,'2026-10-01','2026-10-31'],'$1,$2,$3'),/access required/);
 await db.exec(`reset role;update private.workspace_members set active=false;set role authenticated;`);assert.equal((await context()).allowed,false);
 await db.exec('reset role');for(const signature of ['get_clocking_context(uuid)','get_clock_entries(uuid,date,date)','save_clock_entry(uuid,jsonb,integer)','get_production_labor(uuid,date,date)'])assert.equal((await db.query('select has_function_privilege(\'anon\',$1,\'execute\') allowed',['public.'+signature])).rows[0].allowed,false);
-console.log('PostgreSQL checks passed: eligibility, self-only entries, manager entry, intern access, cast denial, production scope, stale edits, overlap, breaks, work date, aggregate hours, private notes, read-only, suspension, cross-theater and anonymous denial.');await db.close();
+console.log('PostgreSQL checks passed: eligibility, self-only entries, manager entry, intern access, cast denial, production scope, stale edits, overlap, breaks, work date, aggregate hours, private notes, read-only, suspension, cross-theater and anonymous denial.');// Apply the follow-up migration and exercise automatic punches as authenticated users.
+await db.exec(await readFile(new URL('supabase/migrations/20261021034253_clocking_in_out.sql',root),'utf8'));
+await db.exec(`update private.workspace_members set active=true,roles=array['Lighting'],person_id='${person}';update auth.users set read_only=false;set role authenticated;`);
+const punchDraft={id:id(30),person_id:person,production_id:show,department:'Lighting',role:'Designer',notes:'Punch note'};
+const punchIn=(d=punchDraft)=>rpc('clock_in',[t,JSON.stringify(d)],'$1,$2');
+const punchOut=(entry=id(30))=>rpc('clock_out',[t,entry,'Completed work'],'$1,$2,$3');
+const active=()=>rpc('get_active_clock_entries',[t],'$1');
+await assert.rejects(()=>save({...draft,id:id(29)}),/permission denied/);
+const before=Date.now();const punched=await punchIn();assert.equal(punched.ended_at,null);assert.ok(Math.abs(Date.parse(punched.started_at)-before)<10000);assert.equal((await active()).length,1);
+assert.equal((await punchIn()).id,punched.id);await assert.rejects(()=>punchIn({...punchDraft,id:id(31)}),/Already clocked in/);
+for(const forbidden of ['started_at','ended_at','work_date','break_minutes'])await assert.rejects(()=>punchIn({...punchDraft,[forbidden]:'spoofed'}),/no dates, times or break/);
+// Only completed shifts feed labor. Historical fixtures still total 510 minutes.
+assert.equal((await labor()).reduce((n,r)=>n+Number(r.minutes),0),510);
+await db.exec(`reset role;update private.clock_entries set started_at=clock_timestamp()-interval '150 minutes',work_date=((clock_timestamp()-interval '150 minutes') at time zone 'America/New_York')::date where id='${id(30)}';set role authenticated;`);
+const finished=await punchOut();assert.ok(finished.ended_at);assert.ok(Number(finished.minutes)>=150&&Number(finished.minutes)<151);assert.equal((await active()).length,0);assert.equal((await punchOut()).ended_at,finished.ended_at);
+await punchIn({...punchDraft,id:id(32)});
+// A forgotten clock-out may cross dates or exceed 24 hours; it must still be finishable.
+await db.exec(`reset role;update private.clock_entries set started_at=clock_timestamp()-interval '26 hours' where id='${id(32)}';set role authenticated;`);assert.ok(Number((await punchOut(id(32))).minutes)>=1560);
+await db.exec(`reset role;update private.workspace_members set roles=array['Cast'],person_id='${cast}';set role authenticated;`);await assert.rejects(()=>punchIn({...punchDraft,id:id(33)}),/write access/);await assert.rejects(()=>active(),/access required/);
+await db.exec(`reset role;update private.workspace_members set person_id='${intern}';set role authenticated;`);const internPunch=await punchIn({...punchDraft,id:id(34),person_id:intern});assert.equal(internPunch.ended_at,null);await assert.rejects(()=>punchOut(),/accessible clock-in/);
+await db.exec(`reset role;update auth.users set read_only=true;set role authenticated;`);await assert.rejects(()=>punchOut(id(34)),/write access/);
+await db.exec('reset role');for(const signature of ['clock_in(uuid,jsonb)','clock_out(uuid,uuid,text)','get_active_clock_entries(uuid)'])assert.equal((await db.query('select has_function_privilege(\'anon\',$1,\'execute\') allowed',['public.'+signature])).rows[0].allowed,false);
+console.log('Automatic punch checks passed: server time, saved active state, no timestamp/break inputs, one active shift, retry idempotency, completed-only labor, long shifts, old manual API blocked, cast denial, intern access and read-only protection.');await db.close();
