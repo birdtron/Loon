@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {monday,unionMinutes,scheduleDay,taskEstimateForWeek,overdue,parseTaskCSV,taskCSVHeaders,validateTask} from '../../lib/workforce.ts';
+import type {WorkTask,WorkSchedule} from '../../lib/workforce.ts';
+import {configureCalendar} from '../../lib/calendar.ts';
+configureCalendar('America/New_York');
+assert.equal(monday('2026-10-25'),'2026-10-19');assert.equal(monday('2026-10-19'),'2026-10-19');
+assert.equal(unionMinutes([[0,3600000],[1800000,5400000],[7200000,10800000]]),150);
+const t={estimated_minutes:600,assignee_ids:['a','b'],work_dates:['2026-10-19','2026-10-26'],archived:false,status:'In Progress',due_date:'2026-10-20'} as WorkTask;
+assert.equal(taskEstimateForWeek(t,'a','2026-10-19'),300);assert.equal(taskEstimateForWeek(t,'b','2026-10-19'),300);assert.equal(taskEstimateForWeek(t,'c','2026-10-19'),0);assert.equal(overdue(t,'2026-10-21'),true);assert.equal(overdue({...t,status:'Complete'},'2026-10-21'),false);
+const overnight={person_id:'a',category:'Company',starts_at:'2026-11-01T00:00:00-04:00',ends_at:'2026-11-01T04:00:00-05:00'} as WorkSchedule;
+assert.equal(scheduleDay([overnight],'a','2026-11-01').total,300);
+const overlap={...overnight,category:'Show/Rehearsal',starts_at:'2026-11-01T03:00:00-05:00'} as WorkSchedule;
+assert.equal(scheduleDay([overnight,overlap],'a','2026-11-01').total,300);assert.equal(scheduleDay([overnight,overlap],'a','2026-11-01').overlap,true);
+const csv='title,production,department,description\r\n"Paint, test",Show,Scenic,"Two lines\nwith ""quotes"""\r\n';
+assert.equal(parseTaskCSV(csv)[0].description,'Two lines\nwith "quotes"');assert.throws(()=>parseTaskCSV('bad,headers\na,b'));assert.throws(()=>parseTaskCSV('title,production,department\n"Unclosed,Show,Scenic'));
+assert.throws(()=>validateTask({...t,title:'Task',production_id:'show',department:'Scenic',priority:'Normal',description:'',estimated_minutes:NaN} as any));
+assert.equal(taskCSVHeaders.length,11);
+console.log('Workforce unit checks passed: week boundaries, per-assignee estimates, overdue completion, DST duration, overlap union, CSV escaping and invalid inputs.');
