@@ -4,13 +4,13 @@ import {ArrowLeft, ChevronRight, Plus, Search, Pencil} from 'lucide-react';
 import type {CalendarEvent, Production} from '../lib/loon-types';
 import {zoneLabel, addDays, calendarItems, displayDay, displayTime, localDay, matchesProduction, weekSegments} from '../lib/calendar';
 
-type Props = { defaultView?:'calendar'|'list';canEdit?:boolean;
+type Props = { includeRuns?:boolean; defaultView?:'calendar'|'list';canEdit?:boolean;
   productions: Production[]; events: CalendarEvent[];
   onEdit: (event: CalendarEvent) => void;
   onOpenProduction: (id: string) => void;
   onAdd: (day: string, productionId: string) => void;
 };
-export default function MasterCalendar({productions, events, onEdit, onOpenProduction, onAdd,defaultView='calendar',canEdit=true}: Props) {
+export default function MasterCalendar({productions, events, onEdit, onOpenProduction, onAdd,defaultView='calendar',canEdit=true,includeRuns=true}: Props) {
   const [view, setView] = useState(defaultView);
   useEffect(()=>setView(defaultView),[defaultView]);
   const [start, setStart] = useState(() => localDay(new Date()));
@@ -23,7 +23,7 @@ export default function MasterCalendar({productions, events, onEdit, onOpenProdu
   const filteredProductions = productions.filter(p => matchesProduction(p, productionId, series));
   const ids = new Set(filteredProductions.map(p => p.id));
   const filteredEvents = events.filter(e => ids.has(e.production_id) && `${e.title} ${e.category} ${e.event_details || ''}`.toLowerCase().includes(query.toLowerCase()));
-  const items = calendarItems(filteredProductions, filteredEvents).filter(item => !query || `${item.label} ${item.category} ${item.event?.event_details || ''}`.toLowerCase().includes(query.toLowerCase()));
+  const items = calendarItems(includeRuns?filteredProductions:[], filteredEvents).filter(item => !query || `${item.label} ${item.category} ${item.event?.event_details || ''}`.toLowerCase().includes(query.toLowerCase()));
   const rangeCount = items.filter(item => item.startDay <= end && item.endDay >= start).length;
   const activeFilters = Boolean(productionId || series || query);
   function changeSeries(value: string) {
@@ -47,8 +47,8 @@ export default function MasterCalendar({productions, events, onEdit, onOpenProdu
       {activeFilters && <button className="text-button calendar-clear" onClick={() => {setProductionId(''); setSeries(''); setQuery('');}}>Clear filters</button>}
     </div>
     {view === 'calendar' ? <>
-      <div className="calendar-legend"><span data-kind="Performance run">Performance run</span><span data-kind="Performance">Performance</span><span data-kind="Rehearsal">Rehearsal</span><span data-kind="Tech">Tech / Load-in</span><span data-kind="Strike">Strike</span><span data-kind="Meeting">Meeting / Other</span></div>
-      <p className="calendar-caption">{zoneLabel()} · Run bars span opening to closing. Select a run for production details or a timed event to edit it.</p>
+      <div className="calendar-legend">{includeRuns&&<span data-kind="Performance run">Performance run</span>}<span data-kind="Performance">Performance</span><span data-kind="Rehearsal">Rehearsal</span><span data-kind="Tech">Tech / Load-in</span><span data-kind="Strike">Strike</span><span data-kind="Meeting">Meeting / Other</span></div>
+      <p className="calendar-caption">{zoneLabel()} · {includeRuns?'Run bars span opening to closing. Select a run for production details or a timed event to edit it.':'Only events scheduled at this venue are shown.'}</p>
       <div className="calendar-scroll" tabIndex={0} aria-label="30-day calendar, scroll horizontally on small screens">
         <div className="calendar-grid">
           <div className="calendar-weekdays">{Array.from({length: 7}, (_, index) => <div key={index}>{displayDay(addDays(start, index), {weekday: 'short'})}</div>)}</div>

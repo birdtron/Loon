@@ -4,7 +4,7 @@ import type {SettingsContext} from './settings';
 export const avatarOptions=[{id:'bird-00',label:'Eagle'},{id:'bird-01',label:'Cardinal'},{id:'bird-02',label:'Owl'},{id:'bird-03',label:'Peacock'},{id:'bird-04',label:'Songbird'},{id:'bird-05',label:'Origami crane'},{id:'bird-06',label:'Pelican'},{id:'bird-07',label:'Standing bird'},{id:'bird-08',label:'Kiwi'},{id:'bird-09',label:'Flamingo'},{id:'bird-10',label:'Geometric bird'},{id:'bird-11',label:'Flying bird'},{id:'bird-12',label:'Parrot'},{id:'bird-13',label:'Hummingbird'}] as const;
 export const avatars=avatarOptions.map(a=>a.id);
 export const avatarLabel=(id:string)=>avatarOptions.find(a=>a.id===id)?.label||'Bird';
-export const unionOptions=['AEA','SAG-AFTRA','IATSE','AGMA','AGVA','USA 829','SDC','Other'];
+export const unionOptions=['AEA','SAG-AFTRA','IATSE','AFM','UMAW','AGMA','AGVA','USA 829','SDC','Other'];
 export type IntakeAssignment={production_id:string;role:string};
 export type IntakePayload={full_name:string;known_as:string;area:'Cast'|'Creative'|'Admin';job_title:string;department:string;bio:string;favorite_shakespeare:string;unions:string[];other_union:string;intern:boolean;contacts:PersonnelContactDraft;assignments:IntakeAssignment[];avatar:typeof avatars[number];headshot:string;resume:string;resume_name:string;consent:boolean};
 export type IntakeFormInfo={theater_name:string;theater_logo?:string;recipient_email?:string;season_name:string;recipient_name:string;submitted:boolean;productions:{id:string;title:string;roles?:{Cast:string[];Creative:string[]}}[]};

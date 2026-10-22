@@ -11,10 +11,10 @@ export function workspaceNavigation(access:Access):NavigationItem[]{
   ]} as NavigationItem]:[]),
   ...(access.venues?[{id:'venues',label:'Venues',destination:'Venues',icon:'venues',children:[soon('venue-calendar','Venue Calendar'),soon('venue-media','Venue Media Library')]} as NavigationItem]:[]),
   ...(access.personnel?[{id:'personnel',label:'Personnel',destination:'Personnel',icon:'people'} as NavigationItem]:[]),
-  ...(access.stage?[{id:'callboard',label:'Callboard',destination:'Callboard',icon:'callboard',children:[soon('actor-check-in','Actor Check In')]} as NavigationItem]:[]),
+  ...(access.stage?[{id:'callboard',label:'Callboard',destination:'Callboard',icon:'callboard',children:[{id:'actor-check-in',label:'Actor Check In',destination:'ActorCheckIn'}]} as NavigationItem]:[]),
   ...(access.company?[{id:'company',label:'Company Management',destination:'CompanyManagement',icon:'company',children:[{id:'invite',label:'Personnel Invite Link',destination:'CompanyInvites'},{id:'approvals',label:'Personnel Approvals',destination:'CompanyApprovals'},soon('auditions','Auditions Hub')]} as NavigationItem]:[]),
   ...(access.stageReports?[{id:'stage',label:'Stage Management',icon:'stage',children:[
-   ...(access.castScheduling?[{id:'cast-scheduling',label:'Cast Scheduling',destination:'StageSchedule'}]:[]),soon('cast-check-in','Cast Check In'),
+   ...(access.castScheduling?[{id:'cast-scheduling',label:'Cast Scheduling',destination:'StageSchedule'}]:[]),{id:'cast-check-in',label:'Actor Check In',destination:'CheckInFeed'},
    {id:'show-reports',label:'Show Reports',children:[{id:'rehearsal-reports',label:'Rehearsal Reports',destination:'RehearsalReports'},{id:'performance-reports',label:'Performance Reports',destination:'PerformanceReports'}]}
   ]} as NavigationItem]:[])
  ];

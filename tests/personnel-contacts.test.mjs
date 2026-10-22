@@ -10,9 +10,9 @@ test('contact validation rejects malformed email and overlong fields',()=>{
  assert.throws(()=>cleanPersonnelContact({...emptyContact,address_line_1:'a'.repeat(301)}),/too long/);
  assert.doesNotThrow(()=>cleanPersonnelContact(emptyContact));
 });
-test('only administrators or active stage management with stage edit permission see contacts',()=>{
+test('only administrators or active company management with stage edit permission see contacts',()=>{
  const ctx=(role,permission='edit',active=true)=>({admin:false,member:{roles:[role],active},permissions:{stage:permission}});
- for(const role of ['Stage Manager','Assistant Stage Manager','Company Manager'])assert.equal(canManagePersonnelContacts(ctx(role)),true);
- for(const role of ['Cast','Guest','Director','Marketing','Box Office','Production','Production Manager'])assert.equal(canManagePersonnelContacts(ctx(role)),false);
+ for(const role of ['Company Manager'])assert.equal(canManagePersonnelContacts(ctx(role)),true);
+ for(const role of ['Stage Manager','Assistant Stage Manager','Cast','Guest','Director','Marketing','Box Office','Production','Production Manager'])assert.equal(canManagePersonnelContacts(ctx(role)),false);
  assert.equal(canManagePersonnelContacts(ctx('Stage Manager','none')),false);assert.equal(canManagePersonnelContacts(ctx('Stage Manager','view')),false);assert.equal(canManagePersonnelContacts(ctx('Stage Manager','edit',false)),false);assert.equal(canManagePersonnelContacts({...ctx('Cast'),admin:true}),true);assert.equal(canManagePersonnelContacts(null),false);
 });

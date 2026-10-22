@@ -1,0 +1,57 @@
+-- Transaction-only verification. All fixtures and role changes are rolled back.
+begin;
+do $$
+declare u uuid;t uuid;p uuid;actor uuid;e uuid;d date;mid uuid:=gen_random_uuid();result jsonb;denied boolean;zone text;
+begin
+ select m.user_id,m.theater_id into u,t from private.workspace_members m join auth.users a on a.id=m.user_id where a.email_confirmed_at is not null and not exists(select 1 from private.platform_access_grants g where g.user_id=m.user_id) limit 1;
+ if u is null then raise exception 'No non-owner member available for rollback-only tests';end if;
+ perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ delete from private.read_only_users where user_id=u;
+ update private.workspace_members set roles=array['Stage Manager'],active=true,overrides='{}' where user_id=u and theater_id=t;
+ if private.can_manage_personnel_contact(t) then raise exception 'Stage Manager contact leak';end if;
+ if private.can_access_contract(t::text||'/'||gen_random_uuid()::text||'/sample.pdf') then raise exception 'Stage Manager contract leak';end if;
+ select c.production_id,c.person_id,c.event_id into p,actor,e from public.rehearsal_call_cast c where c.theater_id=t limit 1;
+ if actor is null then raise exception 'Need existing cast call';end if;
+ select coalesce(data->'theater'->>'timezone','America/New_York') into zone from private.workspace_settings where theater_id=t;
+ d:=private.theater_today(t);
+ update public.calendar_events set start=(d+time '12:00') at time zone zone,"end"=(d+time '13:00') at time zone zone,venue_id=null,call_status='Published' where id=e;
+ result:=public.get_actor_checkins(t);
+ if not exists(select 1 from jsonb_array_elements(result->'actors') a where a->>'id'=actor::text) then raise exception 'Called actor missing';end if;
+ perform public.check_in_actor(t,actor,d);perform public.check_in_actor(t,actor,d);
+ if (select count(*) from private.actor_checkins where person_id=actor and check_date=d)<>1 then raise exception 'Check-in duplicated';end if;
+ denied:=false;begin perform public.check_in_actor(t,actor,d-1);exception when others then denied:=true;end;if not denied then raise exception 'Stale date accepted';end if;
+ update private.actor_checkins set check_date=d-1 where person_id=actor and check_date=d;
+ result:=public.get_actor_checkins(t);
+ if exists(select 1 from jsonb_array_elements(result->'actors') a where a->>'id'=actor::text and a->>'checked_at' is not null) then raise exception 'Yesterday check-in leaked into today';end if;
+ update public.calendar_events set call_status='Canceled' where id=e;
+ -- Check self check-in and deny an uncalled actor.
+ update private.workspace_members set roles=array['Cast'],person_id=actor,production_ids=array[p],overrides='{}' where user_id=u and theater_id=t;
+ update public.calendar_events set call_status='Published' where id=e;
+ perform public.check_in_actor(t,actor,d);
+ denied:=false;begin perform public.check_in_actor(t,gen_random_uuid(),d);exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Uncalled actor accepted';end if;
+ perform public.post_production_message(p,mid,'Rollback-only verification');perform public.post_production_message(p,mid,'Rollback-only verification');
+ if (select count(*) from private.production_messages where id=mid)<>1 then raise exception 'Duplicate message';end if;
+ perform public.like_production_message(mid,true);perform public.like_production_message(mid,true);
+ if (select count(*) from private.production_message_likes where message_id=mid)<>1 then raise exception 'Duplicate reaction';end if;
+ perform public.like_production_message(mid,false);
+ if exists(select 1 from private.production_message_likes where message_id=mid) then raise exception 'Unlike did not remove reaction';end if;
+ update private.workspace_members set production_ids='{}' where user_id=u and theater_id=t;
+ denied:=false;begin perform public.get_production_messages(p);exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Out-of-scope discussion exposed';end if;
+ update private.workspace_members set roles=array['Company Manager'],overrides='{}' where user_id=u and theater_id=t;
+ if not private.can_manage_personnel_contact(t) then raise exception 'Company Manager cannot manage contacts';end if;
+ if not private.can_access_contract(t::text||'/'||actor::text||'/sample.pdf') then raise exception 'Company Manager cannot access contract';end if;
+ if private.can_access_contract(gen_random_uuid()::text||'/'||actor::text||'/sample.pdf') then raise exception 'Cross-theater contract exposed';end if;
+ if private.can_access_contract('bad/path') then raise exception 'Malformed path allowed';end if;
+ if has_table_privilege('authenticated','private.actor_checkins','SELECT') or has_table_privilege('authenticated','private.production_messages','INSERT') then raise exception 'Direct private-table grant';end if;
+ if has_function_privilege('anon','public.check_in_actor(uuid,uuid,date)','EXECUTE') or has_function_privilege('anon','public.post_production_message(uuid,uuid,text)','EXECUTE') then raise exception 'Anonymous RPC grant';end if;
+ update private.workspace_members set roles=array['Super Admin'] where user_id=u and theater_id=t;
+ if not private.can_access_contract(t::text||'/'||actor::text||'/sample.pdf') then raise exception 'Super Admin contract access denied';end if;
+ insert into private.read_only_users(user_id) values(u);
+ denied:=false;begin perform public.check_in_actor(t,actor,d);exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Read-only check-in allowed';end if;
+ denied:=false;begin perform public.post_production_message(p,gen_random_uuid(),'Read-only test');exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Read-only message allowed';end if;
+ if private.can_access_contract(t::text||'/'||actor::text||'/sample.pdf') then raise exception 'Read-only contract access allowed';end if;
+ perform set_config('request.jwt.claims','{}',true);
+ denied:=false;begin perform public.get_actor_checkins(t);exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Anonymous roster access';end if;
+end $$;
+rollback;
+select 'Passed: role boundaries, private storage, roster, idempotence, midnight dates, reactions, production scope, anonymous denial. Fixtures rolled back.' as verification;

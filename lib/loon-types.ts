@@ -25,14 +25,14 @@ export type Person = {
   id: string; theater_id: string; source_key: string; display_name: string; first_name: string;
   last_name: string; known_as: string; person_types: PersonType[]; job_title: string;
   departments: string[]; area: string; hometown: string; bio: string; favorite_shakespeare: string;
-  unions: string[]; intern: boolean; is_demo: boolean; updated_at: string;
+  portfolio_url: string; unions: string[]; intern: boolean; is_demo: boolean; updated_at: string;
   profile_avatar?: string | null; intake_headshot?: boolean;
   headshot_kind: 'demo' | 'uploaded' | null; headshot_path: string | null;
   headshot_source_url: string | null; headshot_credit: string | null;
   headshot_license: string | null; headshot_license_url: string | null;
 };
 export type ProductionCredit = {id: string; theater_id: string; production_id: string; person_id: string; role: string; credit_type: PersonType; billing_order: number};
-export type PersonDraft = Pick<Person, 'display_name' | 'first_name' | 'last_name' | 'known_as' | 'person_types' | 'job_title' | 'departments' | 'area' | 'hometown' | 'bio' | 'favorite_shakespeare' | 'unions' | 'intern'>;
+export type PersonDraft = Pick<Person, 'display_name' | 'first_name' | 'last_name' | 'known_as' | 'person_types' | 'job_title' | 'departments' | 'area' | 'hometown' | 'bio' | 'favorite_shakespeare' | 'unions' | 'intern' | 'portfolio_url'>;
 
 export type RehearsalCall = {event_id: string; theater_id: string; production_id: string; work: string; act: string; scene: string; location: string};
 export type CallCast = {event_id: string; person_id: string; theater_id: string; production_id: string};
