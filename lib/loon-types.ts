@@ -15,6 +15,7 @@ export type CalendarEvent = {
   title: string; category: 'Performance' | ActivityCategory; start: string; end: string;
   accessibility: string[]; is_special_event: boolean; event_details: string;
   call_status: 'Draft' | 'Published' | 'Canceled'; updated_at: string;
+  rehearsal_schedule?: boolean; schedule_scene?: string; schedule_cast?: string[];
 };
 export type Venue = {id: string; name: string; capacity: number; stage_style: string; description: string};
 export type ActivityDraft = Pick<CalendarEvent, 'production_id' | 'venue_id' | 'title' | 'start' | 'end' | 'event_details' | 'call_status'> & {category: ActivityCategory};
